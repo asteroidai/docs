@@ -1,71 +1,70 @@
 ---
 title: Introduction
-description: 'Welcome to the home of your new documentation'
+description: 'Documentation for Sentinel, the supervision and evaluation system for agentic systems.'
 ---
 
-<img
-  className="block dark:hidden"
-  src="/images/hero-light.svg"
-  alt="Hero Light"
-/>
-<img
-  className="hidden dark:block"
-  src="/images/hero-dark.svg"
-  alt="Hero Dark"
-/>
+Sentinel is an agent control plane built by [Entropy Labs](http://entropy-labs.ai/) that allows you to efficiently supervise and evaluate agentic systems.
 
-## Setting up
+<Frame>
+  <img
+    src="./images/hero.png"
+    alt="Video thumbnail showing editor"
+    width="100%"
+  />
+</Frame>
 
-The first step to world-class documentation is setting up your editing environments.
+## How does it work? 
 
-<CardGroup cols={2}>
-  <Card
-    title="Edit Your Docs"
-    icon="pen-to-square"
-    href="https://mintlify.com/docs/quickstart"
-  >
-    Get your docs set up locally for easy development
+Sentinel has an API that agents can call to submit actions for approval. The request is routed via a predefined list of **supervisors**. When presented when with an action, a supervisor can:
+
+- `approve` The action is safe and the agent can proceed.
+- `reject` The action is unsafe and should not be executed, but the agent can continue.
+- `modify` The action has been approved with modifications.
+- `escalate` The action should be escalated to the next supervisor.
+- `terminate` The agents execution should be terminated.
+
+Finally, after the supervisors have made their decisions, the agent receives a response indicating the outcome of the approval process, which is either `approve`, `reject`, `modify`, or `terminate`. It is up to the agent's source code to handle these responses appropriately.
+
+## Supervisors
+
+
+Sentinel currently provides two types of supervisors for handling tool call suggestions: Human and LLM (Large Language Model).
+
+<CardGroup>
+  <Card title="Human Supervisor" icon="user-check">
+    <p>
+      The Human Supervisor generates a specified number of tool call suggestions and sends them to an external API for human selection.
+    </p>
+    <p>
+      <strong>Key Features:</strong>
+      <ul>
+        <li>Allows manual review and decision-making by a human.</li>
+        <li>Useful for scenarios requiring human judgment and oversight.</li>
+      </ul>
+    </p>
   </Card>
-  <Card
-    title="Preview Changes"
-    icon="image"
-    href="https://mintlify.com/docs/development"
-  >
-    Preview your changes before you push to make sure they're perfect
-  </Card>
-</CardGroup>
 
-## Make it yours
-
-Update your docs to your brand and add valuable content for the best user conversion.
-
-<CardGroup cols={2}>
-  <Card
-    title="Customize Style"
-    icon="palette"
-    href="https://mintlify.com/docs/settings/global"
-  >
-    Customize your docs to your company's colors and brands
-  </Card>
-  <Card
-    title="Reference APIs"
-    icon="code"
-    href="https://mintlify.com/docs/api-playground/openapi"
-  >
-    Automatically generate endpoints from an OpenAPI spec
-  </Card>
-  <Card
-    title="Add Components"
-    icon="screwdriver-wrench"
-    href="https://mintlify.com/docs/components/accordion"
-  >
-    Build interactive features and designs to guide your users
-  </Card>
-  <Card
-    title="Get Inspiration"
-    icon="stars"
-    href="https://mintlify.com/customers"
-  >
-    Check out our showcase of our favorite documentation
+  <Card title="LLM Supervisor" icon="robot">
+    <p>
+      The LLM Supervisor generates a specified number of tool call suggestions and sends them to an external API for selection by a Large Language Model.
+    </p>
+    <p>
+      <strong>Key Features:</strong>
+      <ul>
+        <li>Automates decision-making using advanced language models.</li>
+        <li>Ideal for high-volume or routine tasks where human intervention is not necessary.</li>
+      </ul>
+    </p>
   </Card>
 </CardGroup>
+
+See the [API Reference](/api) to see how to call the API endpoints associated with each supervisor.
+
+In the coming weeks we're planning to add support for more supervisors.
+
+### Custom Supervisors
+The vision for Sentinel is to allow for custom supervisors to be created and plugged in to the approval process. This will allow for a wide range of use cases, including but not limited to:
+- Integrating with existing approval workflows
+- Implementing specialized logic for certain types of actions
+
+Currently, this is not yet supported, but if you have specific approvals processes you'd like to build please reach out.
