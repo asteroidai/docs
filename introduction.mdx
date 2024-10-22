@@ -27,32 +27,30 @@ Finally, after the supervisors have made their decisions, the agent receives a r
 
 ## Supervisors
 
-
 Sentinel currently provides two types of supervisors for handling tool call suggestions: Human and LLM (Large Language Model).
 
 <CardGroup>
   <Card title="Human Supervisor" icon="user-check">
     <p>
-      The Human Supervisor generates a specified number of tool call suggestions and sends them to an external API for human selection.
+      A human reviews the tool call suggestion made by the agent and returns an approval decision.
     </p>
     <p>
-      <strong>Key Features:</strong>
       <ul>
-        <li>Allows manual review and decision-making by a human.</li>
-        <li>Useful for scenarios requiring human judgment and oversight.</li>
+        <li>--> Allows manual review and decision-making by a human.</li>
+        <li>--> Useful for high risk scenarios requiring human judgment and oversight.</li>
+        <li>--> Supports 1 or more tool call suggestions per approval, allowing human to choose the best option.</li>
       </ul>
     </p>
   </Card>
 
   <Card title="LLM Supervisor" icon="robot">
     <p>
-      The LLM Supervisor generates a specified number of tool call suggestions and sends them to an external API for selection by a Large Language Model.
+      A Large Language Model with a customisable prompt analyses the tool call suggestion made by the agent and returns an approval decision.
     </p>
     <p>
-      <strong>Key Features:</strong>
       <ul>
-        <li>Automates decision-making using advanced language models.</li>
-        <li>Ideal for high-volume or routine tasks where human intervention is not necessary.</li>
+        <li>--> Automates decision-making </li>
+        <li>--> Ideal for high-volume or lower risk routine tasks where human intervention is not necessary.</li>
       </ul>
     </p>
   </Card>
@@ -68,3 +66,23 @@ The vision for Sentinel is to allow for custom supervisors to be created and plu
 - Implementing specialized logic for certain types of actions
 
 Currently, this is not yet supported, but if you have specific approvals processes you'd like to build please reach out.
+
+# Architecture
+
+Sentinel uses a simple client-server architecture. The client is a React application that displays information related to agents and their supervision to human operators. The server is a Go application that handles the API requests from the agent and routes them to the appropriate supervisor. Supervisors can be configured via the UI.
+
+Consider the following diagram for a high level overview of how Sentinel works in the case of the Human Supervisor:
+
+```mermaid
+graph TD;
+A[Agent]-->|submit review|B[Sentinel Server];
+A-->|poll status|B;
+B-->|submit review|C[Sentinel UI];
+C-->|reviewer response|B;
+```
+
+In this case, the agent submits a review to the server, which is then displayed in the UI for a human reviewer to approver or reject. The reviewer's response is then submitted back to the server, which updates the status of the review accordingly. 
+
+### Polling for Status Updates
+
+Agents currently poll the server for status updates on their submitted action request, and must hang until the review is complete. This is inefficient, and we will add support for different types of responses in the future like webhooks or event-based notifications.

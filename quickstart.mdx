@@ -3,6 +3,12 @@ title: 'Quickstart'
 description: 'Supervise and evaluate agentic systems'
 ---
 <Steps>
+  <Step title="Clone the repository">
+    Clone the Sentinel repository to your local machine and navigate to the project directory:
+    ```bash
+    git clone https://github.com/EntropyLabsAI/sentinel.git && cd sentinel
+    ```
+  </Step>
   <Step title="Set up environment">
     Copy the example environment file and set the variables:
     ```bash
@@ -25,7 +31,7 @@ description: 'Supervise and evaluate agentic systems'
 
 ## Examples
 
-Sentinel can be used with any agent by sending reviews to the `/api/review` endpoint and checking their status with the `/api/review/status` endpoint.
+Sentinel can be used with any agent by sending reviews to the `/api/review/{supervisor}` endpoint and checking their status with the `/api/review/status` endpoint.
 
 <AccordionGroup>
   <Accordion icon="terminal" title="Using curl">
