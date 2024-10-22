@@ -28,7 +28,7 @@
   "anchors": [
     {
       "name": "API Reference",
-      "openapi": "/openapi.yaml",
+      "openapi": "https://raw.githubusercontent.com/EntropyLabsAI/sentinel/refs/heads/main/server/openapi.yaml",
       "url": "api",
       "icon": "square-terminal"
     }
