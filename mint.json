@@ -41,6 +41,16 @@
         "quickstart",
         "development"
       ]
+    },
+    {
+      "group": "Integrations",
+      "pages": [
+        {
+          "group": "Inspect AI",
+          "pages": ["inspect-AI", "inspect_benchmarks"]
+        },
+        "langChain"
+      ]
     }
   ],
   "footerSocials": {

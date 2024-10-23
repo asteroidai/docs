@@ -43,11 +43,12 @@ Sentinel can be used with any agent by sending reviews to the `/api/review/{supe
              -H "Content-Type: application/json" \
              -d @examples/curl_example/payload.json
         ```
+        You should see `{"id":<review-id>,"status":"queued"}` printed in the terminal.
       </Step>
       <Step title="Check review status">
         Use the `/api/review/status` endpoint:
         ```bash
-        curl http://localhost:8080/api/review/status?id=<review-id>
+        curl http://localhost:8080/api/review/status/<review-id>
         ```
         Replace `<review-id>` with the ID of the submitted review.
       </Step>
@@ -57,26 +58,8 @@ Sentinel can be used with any agent by sending reviews to the `/api/review/{supe
     </Steps>
   </Accordion>
   <Accordion icon="rectangle-terminal" title="Using Inspect">
-    <Steps>
-      <Step title="Install dependencies">
-        ```bash
-        pip install inspect-ai entropy_labs --upgrade
-        ```
-      </Step>
-      <Step title="Navigate to example directory">
-        ```bash
-        cd examples/inspect_example
-        ```
-      </Step>
-      <Step title="Run the example">
-        ```bash
-        inspect eval run.py --approval approval_human.yaml --model openai/gpt-4o --trace
-        ```
-        This will run the example and trigger approvals. View them at `http://localhost:3000`.
-      </Step>
-    </Steps>
     <Info>
-      For more details on the Inspect example, refer to the [example README](https://github.com/EntropyLabsAI/sentinel/tree/main/examples/inspect_example).
+      Steps to run the Inspect example are at [Inspect AI](/inspect-AI).
     </Info>
   </Accordion>
 </AccordionGroup>
