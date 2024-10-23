@@ -1,0 +1,256 @@
+---
+title: 'Inspect AI'
+description: "Supervise and evaluate agentic systems using UK's AI Safety Institute's Inspect AI evaluation framework"
+---
+
+# Getting Started with Inspect AI
+
+Inspect AI is a powerful open-source framework for large language model evaluations. This guide will help you get started with running examples, editing configurations, and understanding the main functionalities of using entropy labs' approvers together with Inspect.
+
+## Running the Inspect AI Example
+
+You can run the Inspect AI example to see how it works and understand how to use it in your own projects. Before running the example, make sure that you cloned the Sentinel repository and that your frontend and backend server are running. You can start them using Docker Compose as described in the [Quickstart guide](/quickstart).
+
+
+<Steps>
+
+<Step title="Install Dependencies">
+To get started, ensure that `inspect-ai` and `entropy-labs` are installed in your Python environment:
+
+````bash
+pip install inspect-ai entropy-labs --upgrade
+````
+
+</Step>
+
+<Step title="Navigate to Example Directory">
+Change to the example directory:
+
+````bash
+cd examples/inspect_example
+````
+
+</Step>
+
+<Step title="Run the Example with Human Approval">
+
+Run the example using human approval for all tools:
+
+````bash
+inspect eval run.py --approval approval_human.yaml --model openai/gpt-4o --trace
+````
+
+This command runs the example and triggers approvals. You can view the approvals at `http://localhost:3000`.
+</Step>
+
+<Step title="Change Approval Configuration">
+You can change the approval configuration by modifying the `approval_human.yaml` file. There are also allowlist examples in the `approval_escalation.yaml` file. To use this configuration:
+
+````bash
+inspect eval run.py --approval approval_escalation.yaml --model openai/gpt-4o --trace
+````
+
+</Step>
+
+<Step title="Run Multiple Agents">
+Entropy Labs server and frontend can be connected to multiple running agents. To try this, you can run the `agents.sh` helper script to run multiple agents in parallel inside a tmux window (requires [tmux](https://github.com/tmux/tmux/wiki)):
+
+````bash
+./agents.sh
+````
+
+This script will start a tmux session with multiple panes, each running a different agent (randomly sampled from the `run.py` script). You can change the number of agents to run by modifying the `PANE_COUNT` variable and change the model by modifying the `MODEL` variable in the script.
+</Step>
+
+</Steps>
+
+## Approval Configuration
+
+Approvals in Inspect AI are configured using YAML files. Examples of approval configurations are provided in the `approval_human.yaml`, `approval_llm.yaml`, and `approval_escalation.yaml` files.
+
+### Using Approvers
+
+We follow the Inspect AI format for the approval configuration. Our approvers are in the `el.supervision.inspect_ai` module. You can install the `entropy-labs` package to get these approvers:
+
+````bash
+pip install entropy-labs
+````
+
+To use the approvers with Inspect AI, you need to import them from the `el` package:
+
+````python
+from el.approvers import _registry
+````
+
+Then, you can reference the approvers in the approval configuration using names like `el/human_approver`.
+
+### Approval Configuration Examples
+
+#### Human Approval
+
+The `approval_human.yaml` file configures human approval for all tools:
+
+````yaml:examples/inspect_example/approval_human.yaml
+approvers:
+  - name: el/human_approver
+    tools: "*"
+    approval_api_endpoint: "http://localhost:8080"
+    agent_id: "my_sample_1_agent"
+    n: 1
+````
+
+#### LLM Approval
+
+The `approval_llm.yaml` file configures approval using a Language Model:
+
+````yaml:examples/inspect_example/approval_llm.yaml
+approvers:
+  - name: el/llm_approver
+    tools: "*"
+    approval_api_endpoint: "http://localhost:8080"
+    agent_id: "my_sample_1_agent"
+    n: 1
+````
+
+#### Escalation with Allowlists
+
+In the `approval_escalation.yaml` example, approvals for bash and Python tools are done by checking if the commands or modules/functions used are in the allowed list. If approval is not passed, human approval is triggered.
+
+````yaml:examples/inspect_example/approval_escalation.yaml
+approvers:
+  - name: el/bash_approver
+    tools: "*bash*"
+    allowed_commands: ["ls", "cd", "pwd", "echo", "cat", "grep", "mkdir", "cp", "wget", "curl", "pip"]
+    allow_sudo: false
+    command_specific_rules:
+      pip: ["install", "list", "show"]
+
+  - name: el/python_approver
+    tools: "*python*"
+    allowed_modules: ["requests", "json", "csv", "datetime", "re", "math", "random", "time"]
+    allowed_functions: ["print", "len", "range", "str", "int", "float", "list", "dict", "set", "tuple", "sum", "max", "min"]
+    disallowed_builtins: ["eval", "exec", "compile", "__import__", "open", "input"]
+    sensitive_modules: ["os", "sys", "subprocess", "socket"]
+    allow_system_state_modification: false
+
+  - name: el/human_approver
+    tools: "*"
+    approval_api_endpoint: "http://localhost:8080"
+    agent_id: "testing_agent"
+    n: 2
+````
+
+This configuration ensures that only approved Python modules and functions, as well as specific bash commands, can be used without triggering human approval. Any attempts to use disallowed or sensitive operations will require human intervention through the specified API endpoint.
+
+## Understanding the Approvers
+
+### Human Approver
+
+The human approver requires human interaction to approve or reject actions taken by the agent. The approvals are managed through the approval API endpoint specified in the configuration.
+
+### Bash Approver
+
+The bash approver checks bash commands against an allowlist of permitted commands. It can be configured to allow or disallow specific commands, arguments, and the use of `sudo`.
+
+### Python Approver
+
+The python approver checks Python code for the use of allowed modules and functions. It can disallow certain built-in functions and sensitive modules that might pose security risks.
+
+{/*TODO: Implement custom approvers
+
+## Implementing Custom Approvers
+
+You can implement custom approvers by creating new classes in the `el.approvers` module or extending existing ones.
+
+````python:examples/inspect_example/custom_approver.py
+from el.approvers import BaseApprover
+
+class CustomApprover(BaseApprover):
+    def approve(self, action):
+        # Implement your custom approval logic here
+        pass
+````
+
+Then, you can reference your custom approver in the approval configuration:
+
+````yaml
+approvers:
+  - name: el/custom_approver
+    tools: "*"
+    # Additional configuration options
+```` */}
+
+## Inspect AI Example Code
+
+Below is the main example code that demonstrates how to use Inspect AI with approvals.
+
+````python:examples/inspect_example/run.py
+from pathlib import Path
+from inspect_ai import Task, eval, task
+from inspect_ai.dataset import Sample
+from inspect_ai.solver import generate, system_message, use_tools
+from inspect_ai.tool import bash, python
+import random
+import logging
+from el.supervision.inspect_ai import _registry
+
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+@task
+def approval_demo() -> Task:
+    """
+    Creates a demonstration task for approval processes.
+    """
+    example_samples = [
+        Sample(
+            input="Build a Python web scraping script to extract the titles, authors, and prices of the top 100 bestselling books on Amazon, then store the data in a CSV file."
+        ),
+        # Additional sample tasks...
+    ]
+    return Task(
+        dataset=[random.choice(example_samples)],
+        solver=[
+            system_message(
+                "You are an extremely capable general purpose agent..."
+            ),
+            use_tools(bash(), python()),
+            generate(),
+        ],
+        sandbox="docker",
+    )
+
+if __name__ == "__main__":
+    approval = (Path(__file__).parent / "approval.yaml").as_posix()
+    eval(approval_demo(), approval=approval, trace=True, model="openai/gpt-4o")
+````
+
+## Editing Configurations
+
+You can customize the behavior of your agents by editing the approval YAML files and modifying the example code.
+
+### Changing the Approval File
+
+When running the example, you can specify a different approval configuration file using the `--approval` argument:
+
+````bash
+inspect eval run.py --approval approval_escalation.yaml --model openai/gpt-4o --trace
+````
+
+### Modifying the Agent Script
+
+You can edit `run.py` to change the tasks, the tools used, and other aspects of the agent's behavior.
+
+## Using Different Models
+
+You can change the model used by specifying the `--model` argument when running the example:
+
+````bash
+inspect eval run.py --approval approval_human.yaml --model openai/gpt-4o-mini --trace
+````
+
+## Additional Resources
+
+For more information on Inspect AI and approval configurations, refer to the [Inspect AI documentation](https://inspect.ai-safety-institute.org.uk/approval.html) and the [Entropy Labs package](https://pypi.org/project/entropy-labs/).
+
+
