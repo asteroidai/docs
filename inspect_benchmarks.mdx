@@ -1,0 +1,215 @@
+---
+title: 'Inspect Benchmarks'
+description: "Run any Inspect benchmark with Entropy Labs' approvers."
+---
+
+# Running Inspect AI Benchmarks with Entropy Labs' Approvers
+
+This guide explains how to run any benchmark from Inspect AI using Entropy Labs' approvers. We'll provide specific examples for benchmarks like SWE-Bench and show how to configure approvals for these evaluations.
+
+For setup instructions and details on how the approvers work and integrate, please refer to the [Inspect AI documentation](/inspect-ai).
+
+## Running Any Benchmark
+
+To run an evaluation with approval, use the following command:
+
+```bash
+inspect eval $eval_name --model $model --limit $limit --approval $approval_yaml
+```
+
+Replace the variables as follows:
+
+- `$eval_name`: The name of the evaluation you want to run.
+- `$model`: The model you want to use (e.g., `openai/gpt-4o`).
+- `$limit`: The number of samples you want to run.
+- `$approval_yaml`: The path to your approval configuration YAML file.
+
+You can find the list of available evaluations [here](https://inspect.ai-safety-institute.org.uk/examples/) or in the [Inspect AI repository](https://github.com/UKGovernmentBEIS/inspect_evals/tree/main/src/inspect_evals).
+
+## Benchmarks
+
+Below is a list of benchmarks with steps to run each one. Click on a benchmark to see the instructions.
+
+<AccordionGroup>
+
+<Accordion title="SWE-Bench" icon="file-code">
+
+SWE-Bench evaluates software engineering capabilities of language models.
+
+<Steps>
+
+<Step title="Navigate to the Benchmark Directory">
+Change to the directory containing the benchmark examples:
+
+```bash
+cd examples/inspect_evals/swe_bench
+```
+
+</Step>
+
+<Step title="Set Up the Approval Configuration">
+Edit the `approval.yaml` file to configure the approvers as needed. An example configuration is provided below:
+
+```yaml:examples/inspect_evals/swe_bench/approval.yaml
+approvers:
+  - name: el/bash_approver
+    tools: "*bash*"
+    allowed_commands: ["ls", "cd", "pwd", "echo", "cat", "grep", "mkdir", "cp", "wget", "curl", "pip"]
+    allow_sudo: false
+    command_specific_rules:
+      pip: ["install", "list", "show"]
+
+  - name: el/human_approver
+    tools: "*"
+    approval_api_endpoint: "http://localhost:8080"
+    agent_id: "testing_agent"
+    n: 2
+```
+
+</Step>
+
+<Step title="Run the SWE-Bench Evaluation">
+Run the evaluation using the following command:
+
+```bash
+inspect eval inspect_evals/swe_bench --model openai/gpt-4o --limit 10 --approval approval.yaml
+```
+
+This command runs the SWE-Bench evaluation using the `openai/gpt-4o` model on 10 samples with the specified approval configuration.
+
+</Step>
+
+</Steps>
+
+</Accordion>
+
+<Accordion title="GDM In-House CTF" icon="terminal">
+
+The GDM In-House CTF evaluates general capabilities in a capture-the-flag setting.
+
+<Steps>
+
+<Step title="Navigate to the Benchmark Directory">
+
+```bash
+cd examples/inspect_evals/gdm_in_house_ctf
+```
+
+</Step>
+
+<Step title="Set Up the Approval Configuration">
+Edit the `approval.yaml` file as needed. An example configuration:
+
+```yaml:examples/inspect_evals/gdm_in_house_ctf/approval.yaml
+approvers:
+  - name: el/bash_approver
+    tools: "*bash*"
+    allowed_commands: ["ls", "cd", "pwd", "echo", "cat", "grep", "mkdir", "cp", "wget", "curl", "pip"]
+    allow_sudo: false
+    command_specific_rules:
+      pip: ["install", "list", "show"]
+
+  - name: el/python_approver
+    tools: "*python*"
+    allowed_modules: ["requests", "json", "csv", "datetime", "re", "math", "random", "time"]
+    allowed_functions: ["print", "len", "range", "str", "int", "float", "list", "dict", "set", "tuple", "sum", "max", "min"]
+    disallowed_builtins: ["eval", "exec", "compile", "__import__", "open", "input"]
+    sensitive_modules: ["os", "sys", "subprocess", "socket"]
+    allow_system_state_modification: false
+
+  - name: el/human_approver
+    tools: "*"
+    approval_api_endpoint: "http://localhost:8080"
+    agent_id: "testing_agent"
+    n: 2
+```
+
+</Step>
+
+<Step title="Run the GDM In-House CTF Evaluation">
+
+```bash
+inspect eval inspect_evals/gdm_in_house_ctf --model openai/gpt-4o --limit 10 --approval approval.yaml
+```
+
+</Step>
+
+</Steps>
+
+</Accordion>
+
+<Accordion title="Intercode CTF" icon="puzzle">
+
+Intercode CTF is another capability evaluation in a capture-the-flag format.
+
+<Steps>
+
+<Step title="Navigate to the Benchmark Directory">
+
+```bash
+cd examples/inspect_evals/intercode_ctf
+```
+
+</Step>
+
+<Step title="Set Up the Approval Configuration">
+Edit the `approval.yaml` file. An example configuration:
+
+```yaml:examples/inspect_evals/intercode_ctf/approval.yaml
+approvers:
+  - name: el/bash_approver
+    tools: "*bash*"
+    allowed_commands: ["ls", "cd", "pwd", "echo", "cat", "grep", "mkdir", "cp", "wget", "curl", "pip"]
+    allow_sudo: false
+    command_specific_rules:
+      pip: ["install", "list", "show"]
+
+  - name: el/python_approver
+    tools: "*python*"
+    allowed_modules: ["requests", "json", "csv", "datetime", "re", "math", "random", "time"]
+    allowed_functions: ["print", "len", "range", "str", "int", "float", "list", "dict", "set", "tuple", "sum", "max", "min"]
+    disallowed_builtins: ["eval", "exec", "compile", "__import__", "open", "input"]
+    sensitive_modules: ["os", "sys", "subprocess", "socket"]
+    allow_system_state_modification: false
+
+  - name: el/human_approver
+    tools: "*"
+    approval_api_endpoint: "http://localhost:8080"
+    agent_id: "testing_agent"
+    n: 2
+```
+
+</Step>
+
+<Step title="Run the Intercode CTF Evaluation">
+
+```bash
+inspect eval inspect_evals/gdm_intercode_ctf --model openai/gpt-4o --limit 10 --approval approval.yaml
+```
+
+</Step>
+
+</Steps>
+
+</Accordion>
+
+</AccordionGroup>
+
+## Customizing Approvals
+
+You can customize the approval configurations by editing the `approval.yaml` files for each benchmark. This allows you to:
+
+- Specify which tools require approval.
+- Define allowlists for commands and functions.
+- Configure human or LLM approval.
+
+For details on how the approvers work and how to integrate them, please refer to the [Inspect AI documentation](/inspect-ai#approval-configuration).
+
+## Additional Resources
+
+- [Inspect AI Benchmarks Repository](https://github.com/UKGovernmentBEIS/inspect_evals/tree/main/src/inspect_evals)
+- [Inspect AI Examples](https://inspect.ai-safety-institute.org.uk/examples/)
+
+---
+
+
