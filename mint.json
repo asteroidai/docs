@@ -47,7 +47,7 @@
       "pages": [
         {
           "group": "Inspect AI",
-          "pages": ["inspect-AI", "inspect_benchmarks"]
+          "pages": ["inspect-ai", "inspect_benchmarks"]
         },
         "langChain"
       ]
