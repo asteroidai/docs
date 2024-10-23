@@ -49,7 +49,7 @@
           "group": "Inspect AI",
           "pages": ["inspect-ai", "inspect_benchmarks"]
         },
-        "langChain"
+        "langchain"
       ]
     }
   ],
