@@ -5,7 +5,7 @@ description: "Run any Inspect benchmark with Entropy Labs' approvers."
 
 # Running Inspect AI Benchmarks with Entropy Labs' Approvers
 
-This guide explains how to run any benchmark from Inspect AI using Entropy Labs' approvers. We'll provide specific examples for benchmarks like SWE-Bench and show how to configure approvals for these evaluations.
+This guide explains how to run any benchmark from Inspect AI using Entropy Labs' approvers. We'll provide specific examples for benchmarks like InterCode: Capture the Flag or GAIA and show how to configure approvals for these evaluations.
 
 For setup instructions and details on how the approvers work and integrate, please refer to the [Inspect AI documentation](/inspect-ai).
 
@@ -30,58 +30,15 @@ You can find the list of available evaluations [here](https://inspect.ai-safety-
 
 Below is a list of benchmarks with steps to run each one. Click on a benchmark to see the instructions.
 
+
+First install the Inspect eval benchmark package:
+
+```bash
+pip install inspect_ai
+pip install git+https://github.com/UKGovernmentBEIS/inspect_evals
+```
+
 <AccordionGroup>
-
-<Accordion title="SWE-Bench" icon="file-code">
-
-SWE-Bench evaluates software engineering capabilities of language models.
-
-<Steps>
-
-<Step title="Navigate to the Benchmark Directory">
-Change to the directory containing the benchmark examples:
-
-```bash
-cd examples/inspect_evals/swe_bench
-```
-
-</Step>
-
-<Step title="Set Up the Approval Configuration">
-Edit the `approval.yaml` file to configure the approvers as needed. An example configuration is provided below:
-
-```yaml:examples/inspect_evals/swe_bench/approval.yaml
-approvers:
-  - name: el/bash_approver
-    tools: "*bash*"
-    allowed_commands: ["ls", "cd", "pwd", "echo", "cat", "grep", "mkdir", "cp", "wget", "curl", "pip"]
-    allow_sudo: false
-    command_specific_rules:
-      pip: ["install", "list", "show"]
-
-  - name: el/human_approver
-    tools: "*"
-    approval_api_endpoint: "http://localhost:8080"
-    agent_id: "testing_agent"
-    n: 2
-```
-
-</Step>
-
-<Step title="Run the SWE-Bench Evaluation">
-Run the evaluation using the following command:
-
-```bash
-inspect eval inspect_evals/swe_bench --model openai/gpt-4o --limit 10 --approval approval.yaml
-```
-
-This command runs the SWE-Bench evaluation using the `openai/gpt-4o` model on 10 samples with the specified approval configuration.
-
-</Step>
-
-</Steps>
-
-</Accordion>
 
 <Accordion title="GDM In-House CTF" icon="terminal">
 
@@ -102,14 +59,14 @@ Edit the `approval.yaml` file as needed. An example configuration:
 
 ```yaml:examples/inspect_evals/gdm_in_house_ctf/approval.yaml
 approvers:
-  - name: el/bash_approver
+  - name: entropy_labs/bash_approver
     tools: "*bash*"
     allowed_commands: ["ls", "cd", "pwd", "echo", "cat", "grep", "mkdir", "cp", "wget", "curl", "pip"]
     allow_sudo: false
     command_specific_rules:
       pip: ["install", "list", "show"]
 
-  - name: el/python_approver
+  - name: entropy_labs/python_approver
     tools: "*python*"
     allowed_modules: ["requests", "json", "csv", "datetime", "re", "math", "random", "time"]
     allowed_functions: ["print", "len", "range", "str", "int", "float", "list", "dict", "set", "tuple", "sum", "max", "min"]
@@ -117,7 +74,7 @@ approvers:
     sensitive_modules: ["os", "sys", "subprocess", "socket"]
     allow_system_state_modification: false
 
-  - name: el/human_approver
+  - name: entropy_labs/human_approver
     tools: "*"
     approval_api_endpoint: "http://localhost:8080"
     agent_id: "testing_agent"
@@ -131,10 +88,13 @@ approvers:
 ```bash
 inspect eval inspect_evals/gdm_in_house_ctf --model openai/gpt-4o --limit 10 --approval approval.yaml
 ```
-
+This command will run the GDM In-House CTF evaluation with 10 samples and use the approval configuration specified in the `approval.yaml` file.
 </Step>
 
+
 </Steps>
+
+More information on how to run the GDM In-House CTF benchmark with Inspect AI can be found [here](https://github.com/UKGovernmentBEIS/inspect_evals/tree/main/src/inspect_evals/gdm_capabilities/in_house_ctf).
 
 </Accordion>
 
@@ -157,14 +117,14 @@ Edit the `approval.yaml` file. An example configuration:
 
 ```yaml:examples/inspect_evals/intercode_ctf/approval.yaml
 approvers:
-  - name: el/bash_approver
+  - name: entropy_labs/bash_approver
     tools: "*bash*"
     allowed_commands: ["ls", "cd", "pwd", "echo", "cat", "grep", "mkdir", "cp", "wget", "curl", "pip"]
     allow_sudo: false
     command_specific_rules:
       pip: ["install", "list", "show"]
 
-  - name: el/python_approver
+  - name: entropy_labs/python_approver
     tools: "*python*"
     allowed_modules: ["requests", "json", "csv", "datetime", "re", "math", "random", "time"]
     allowed_functions: ["print", "len", "range", "str", "int", "float", "list", "dict", "set", "tuple", "sum", "max", "min"]
@@ -172,7 +132,7 @@ approvers:
     sensitive_modules: ["os", "sys", "subprocess", "socket"]
     allow_system_state_modification: false
 
-  - name: el/human_approver
+  - name: entropy_labs/human_approver
     tools: "*"
     approval_api_endpoint: "http://localhost:8080"
     agent_id: "testing_agent"
@@ -186,10 +146,71 @@ approvers:
 ```bash
 inspect eval inspect_evals/gdm_intercode_ctf --model openai/gpt-4o --limit 10 --approval approval.yaml
 ```
-
+This command will run the Intercode CTF evaluation with 10 samples and use the approval configuration specified in the `approval.yaml` file.
 </Step>
 
 </Steps>
+
+More information on how to run the Intercode CTF benchmark with Inspect AI can be found [here](https://github.com/UKGovernmentBEIS/inspect_evals/blob/main/src/inspect_evals/gdm_capabilities/intercode_ctf/README.md).
+
+</Accordion>
+
+<Accordion title="GAIA" icon="terminal">
+
+The GAIA (General AI Assistants) benchmark consists of 450 questions testing tool use on realistic assistant tasks (mostly web browsing).
+
+Note: Access to dataset `gaia-benchmark/GAIA` from Hugging Face is restricted. You must have access to it and be authenticated to access it.
+
+<Steps>
+
+<Step title="Navigate to the Benchmark Directory">
+
+```bash
+cd examples/inspect_evals/gaia
+```
+
+</Step>
+
+<Step title="Set Up the Approval Configuration">
+Edit the `approval.yaml` file. An example configuration:
+
+```yaml:examples/inspect_evals/intercode_ctf/approval.yaml
+approvers:
+  - name: entropy_labs/bash_approver
+    tools: "*bash*"
+    allowed_commands: ["ls", "cd", "pwd", "echo", "cat", "grep", "mkdir", "cp", "wget", "curl", "pip"]
+    allow_sudo: false
+    command_specific_rules:
+      pip: ["install", "list", "show"]
+
+  - name: entropy_labs/python_approver
+    tools: "*python*"
+    allowed_modules: ["requests", "json", "csv", "datetime", "re", "math", "random", "time"]
+    allowed_functions: ["print", "len", "range", "str", "int", "float", "list", "dict", "set", "tuple", "sum", "max", "min"]
+    disallowed_builtins: ["eval", "exec", "compile", "__import__", "open", "input"]
+    sensitive_modules: ["os", "sys", "subprocess", "socket"]
+    allow_system_state_modification: false
+
+  - name: entropy_labs/human_approver
+    tools: "*"
+    approval_api_endpoint: "http://localhost:8080"
+    agent_id: "testing_agent"
+    n: 2
+```
+
+</Step>
+
+<Step title="Run the GAIA Evaluation">
+
+```bash
+inspect eval inspect_evals/gaia --model openai/gpt-4o --limit 10 --approval approval.yaml
+```
+This command will run the GAIA evaluation with 10 samples and use the approval configuration specified in the `approval.yaml` file.
+</Step>
+
+</Steps>
+
+More information on how to run the GAIA benchmark with Inspect AI can be found [here](https://github.com/UKGovernmentBEIS/inspect_evals/tree/main/src/inspect_evals/gaia).
 
 </Accordion>
 
@@ -211,5 +232,3 @@ For details on how the approvers work and how to integrate them, please refer to
 - [Inspect AI Examples](https://inspect.ai-safety-institute.org.uk/examples/)
 
 ---
-
-
