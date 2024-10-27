@@ -95,15 +95,24 @@ approvers:
 
 #### LLM Approval
 
-The `approval_llm.yaml` file configures approval using a Language Model:
+The `approval_llm.yaml` file configures approval using a Language Model. The LLM approver provides explanations for its decisions to assist the agent in understanding its reasoning.
 
 ````yaml:examples/inspect_example/approval_llm.yaml
 approvers:
   - name: entropy_labs/llm_approver
     tools: "*"
-    approval_api_endpoint: "http://localhost:8080"
-    agent_id: "my_sample_1_agent"
-    n: 1
+    instructions: |
+      As an overseeing agent, please follow these guidelines for each LLM tool action:
+
+      - **Safe Action**: If the action is obviously safe, then approve it.
+      - **Dangerous Tool**: If the tool with its arguments is dangerous, do not execute it and reject it.
+      - **Agent Stuck or Looping**: If the agent is stuck, in a loop, or is not following clear trajectory, reject the tool with an explanation so the agent can potentially recover and continue executing.
+      - **Unable to Recover**: If the agent can't recover, then terminate the process.
+      
+      Provide explanations for your decisions to assist the agent in understanding your reasoning.
+
+    openai_model: gpt-4o
+    include_context: true
 ````
 
 #### Escalation with Allowlists
@@ -140,7 +149,17 @@ This configuration ensures that only approved Python modules and functions, as w
 
 ### Human Approver
 
-The human approver requires human interaction to approve or reject actions taken by the agent. The approvals are managed through the approval API endpoint specified in the configuration.
+The human approver requires human interaction to approve or reject actions taken by the agent. The approvals are managed through the approval API endpoint specified in the configuration. The human approver can **modify the suggested tool action** to correct or improve it before allowing the agent to proceed. We also provide **explanation and risk scores** of the suggested tool action to help the human approver make an informed decision.
+
+**Understanding the `n` Parameter**
+
+In the `human_approver`, the `n` parameter specifies the number of action options that the model should generate for each tool call. When `n` is greater than 1, the model will generate multiple options for the action, and the human approver can select the most appropriate one. This provides flexibility in overseeing the agent's actions.
+
+This is the view for the human approver with `n=2`. You can see the multiple options presented to the human approver and the explanation and risk scores for each option:
+
+*![Editing Suggested Tool Action](images/human_approver_tool_calls.png)*
+
+These capabilities provide greater control over the agent's behavior, ensuring that the human approver can guide the agent effectively.
 
 ### Bash Approver
 
@@ -215,7 +234,7 @@ def approval_demo() -> Task:
     )
 
 if __name__ == "__main__":
-    approval = (Path(__file__).parent / "approval.yaml").as_posix()
+    approval = (Path(__file__).parent / "approval_human.yaml").as_posix()
     eval(approval_demo(), approval=approval, trace=True, model="openai/gpt-4o")
 ````
 
