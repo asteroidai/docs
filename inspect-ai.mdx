@@ -70,19 +70,13 @@ Approvals in Inspect AI are configured using YAML files. Examples of approval co
 
 ### Using Approvers
 
-We follow the Inspect AI format for the approval configuration. Our approvers are in the `el.supervision.inspect_ai` module. You can install the `entropy-labs` package to get these approvers:
+We follow the Inspect AI format for the approval configuration. Our approvers are in the `entropy-labs` package. You can install the `entropy-labs` package to get these approvers:
 
 ````bash
 pip install entropy-labs
 ````
 
-To use the approvers with Inspect AI, you need to import them from the `el` package:
-
-````python
-from el.approvers import _registry
-````
-
-Then, you can reference the approvers in the approval configuration using names like `el/human_approver`.
+Then, you can reference the approvers in the approval configuration using names like `entropy_labs/human_approver`.
 
 ### Approval Configuration Examples
 
@@ -92,7 +86,7 @@ The `approval_human.yaml` file configures human approval for all tools:
 
 ````yaml:examples/inspect_example/approval_human.yaml
 approvers:
-  - name: el/human_approver
+  - name: entropy_labs/human_approver
     tools: "*"
     approval_api_endpoint: "http://localhost:8080"
     agent_id: "my_sample_1_agent"
@@ -118,14 +112,14 @@ In the `approval_escalation.yaml` example, approvals for bash and Python tools a
 
 ````yaml:examples/inspect_example/approval_escalation.yaml
 approvers:
-  - name: el/bash_approver
+  - name: entropy_labs/bash_approver
     tools: "*bash*"
     allowed_commands: ["ls", "cd", "pwd", "echo", "cat", "grep", "mkdir", "cp", "wget", "curl", "pip"]
     allow_sudo: false
     command_specific_rules:
       pip: ["install", "list", "show"]
 
-  - name: el/python_approver
+  - name: entropy_labs/python_approver
     tools: "*python*"
     allowed_modules: ["requests", "json", "csv", "datetime", "re", "math", "random", "time"]
     allowed_functions: ["print", "len", "range", "str", "int", "float", "list", "dict", "set", "tuple", "sum", "max", "min"]
@@ -133,7 +127,7 @@ approvers:
     sensitive_modules: ["os", "sys", "subprocess", "socket"]
     allow_system_state_modification: false
 
-  - name: el/human_approver
+  - name: entropy_labs/human_approver
     tools: "*"
     approval_api_endpoint: "http://localhost:8080"
     agent_id: "testing_agent"
@@ -192,7 +186,7 @@ from inspect_ai.solver import generate, system_message, use_tools
 from inspect_ai.tool import bash, python
 import random
 import logging
-from el.supervision.inspect_ai import _registry
+from entropy_labs.supervision.inspect_ai import _registry
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
