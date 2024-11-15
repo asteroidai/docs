@@ -28,8 +28,8 @@
   "anchors": [
     {
       "name": "API Reference",
-      "openapi": "https://raw.githubusercontent.com/EntropyLabsAI/sentinel/refs/heads/main/server/openapi.yaml",
-      "url": "api",
+      "openapi": "/openapi.yaml",
+      "url": "api-reference",
       "icon": "square-terminal"
     }
   ],
@@ -39,17 +39,22 @@
       "pages": [
         "introduction",
         "quickstart",
+        "main_Components",
         "development"
       ]
     },
     {
       "group": "Integrations",
       "pages": [
+        "openAI",
+        "langchain",
         {
           "group": "Inspect AI",
-          "pages": ["inspect-AI", "inspect_benchmarks"]
-        },
-        "langChain"
+          "pages": [
+            "inspect-ai",
+            "inspect_benchmarks"
+          ]
+        }
       ]
     }
   ],

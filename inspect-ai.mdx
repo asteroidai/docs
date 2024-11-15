@@ -70,19 +70,13 @@ Approvals in Inspect AI are configured using YAML files. Examples of approval co
 
 ### Using Approvers
 
-We follow the Inspect AI format for the approval configuration. Our approvers are in the `el.supervision.inspect_ai` module. You can install the `entropy-labs` package to get these approvers:
+We follow the Inspect AI format for the approval configuration. Our approvers are in the `entropy-labs` package. You can install the `entropy-labs` package to get these approvers:
 
 ````bash
 pip install entropy-labs
 ````
 
-To use the approvers with Inspect AI, you need to import them from the `el` package:
-
-````python
-from el.approvers import _registry
-````
-
-Then, you can reference the approvers in the approval configuration using names like `el/human_approver`.
+Then, you can reference the approvers in the approval configuration using names like `entropy_labs/human_approver`.
 
 ### Approval Configuration Examples
 
@@ -92,7 +86,7 @@ The `approval_human.yaml` file configures human approval for all tools:
 
 ````yaml:examples/inspect_example/approval_human.yaml
 approvers:
-  - name: el/human_approver
+  - name: entropy_labs/human_approver
     tools: "*"
     approval_api_endpoint: "http://localhost:8080"
     agent_id: "my_sample_1_agent"
@@ -101,15 +95,24 @@ approvers:
 
 #### LLM Approval
 
-The `approval_llm.yaml` file configures approval using a Language Model:
+The `approval_llm.yaml` file configures approval using a Language Model. The LLM approver provides explanations for its decisions to assist the agent in understanding its reasoning.
 
 ````yaml:examples/inspect_example/approval_llm.yaml
 approvers:
-  - name: el/llm_approver
+  - name: entropy_labs/llm_approver
     tools: "*"
-    approval_api_endpoint: "http://localhost:8080"
-    agent_id: "my_sample_1_agent"
-    n: 1
+    instructions: |
+      As an overseeing agent, please follow these guidelines for each LLM tool action:
+
+      - **Safe Action**: If the action is obviously safe, then approve it.
+      - **Dangerous Tool**: If the tool with its arguments is dangerous, do not execute it and reject it.
+      - **Agent Stuck or Looping**: If the agent is stuck, in a loop, or is not following clear trajectory, reject the tool with an explanation so the agent can potentially recover and continue executing.
+      - **Unable to Recover**: If the agent can't recover, then terminate the process.
+      
+      Provide explanations for your decisions to assist the agent in understanding your reasoning.
+
+    openai_model: gpt-4o
+    include_context: true
 ````
 
 #### Escalation with Allowlists
@@ -118,14 +121,14 @@ In the `approval_escalation.yaml` example, approvals for bash and Python tools a
 
 ````yaml:examples/inspect_example/approval_escalation.yaml
 approvers:
-  - name: el/bash_approver
+  - name: entropy_labs/bash_approver
     tools: "*bash*"
     allowed_commands: ["ls", "cd", "pwd", "echo", "cat", "grep", "mkdir", "cp", "wget", "curl", "pip"]
     allow_sudo: false
     command_specific_rules:
       pip: ["install", "list", "show"]
 
-  - name: el/python_approver
+  - name: entropy_labs/python_approver
     tools: "*python*"
     allowed_modules: ["requests", "json", "csv", "datetime", "re", "math", "random", "time"]
     allowed_functions: ["print", "len", "range", "str", "int", "float", "list", "dict", "set", "tuple", "sum", "max", "min"]
@@ -133,7 +136,7 @@ approvers:
     sensitive_modules: ["os", "sys", "subprocess", "socket"]
     allow_system_state_modification: false
 
-  - name: el/human_approver
+  - name: entropy_labs/human_approver
     tools: "*"
     approval_api_endpoint: "http://localhost:8080"
     agent_id: "testing_agent"
@@ -146,7 +149,17 @@ This configuration ensures that only approved Python modules and functions, as w
 
 ### Human Approver
 
-The human approver requires human interaction to approve or reject actions taken by the agent. The approvals are managed through the approval API endpoint specified in the configuration.
+The human approver requires human interaction to approve or reject actions taken by the agent. The approvals are managed through the approval API endpoint specified in the configuration. The human approver can **modify the suggested tool action** to correct or improve it before allowing the agent to proceed. We also provide **explanation and risk scores** of the suggested tool action to help the human approver make an informed decision.
+
+**Understanding the `n` Parameter**
+
+In the `human_approver`, the `n` parameter specifies the number of action options that the model should generate for each tool call. When `n` is greater than 1, the model will generate multiple options for the action, and the human approver can select the most appropriate one. This provides flexibility in overseeing the agent's actions.
+
+This is the view for the human approver with `n=2`. You can see the multiple options presented to the human approver and the explanation and risk scores for each option:
+
+*![Editing Suggested Tool Action](images/human_approver_tool_calls.png)*
+
+These capabilities provide greater control over the agent's behavior, ensuring that the human approver can guide the agent effectively.
 
 ### Bash Approver
 
@@ -192,7 +205,7 @@ from inspect_ai.solver import generate, system_message, use_tools
 from inspect_ai.tool import bash, python
 import random
 import logging
-from el.supervision.inspect_ai import _registry
+from entropy_labs.supervision.inspect_ai import _registry
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -221,7 +234,7 @@ def approval_demo() -> Task:
     )
 
 if __name__ == "__main__":
-    approval = (Path(__file__).parent / "approval.yaml").as_posix()
+    approval = (Path(__file__).parent / "approval_human.yaml").as_posix()
     eval(approval_demo(), approval=approval, trace=True, model="openai/gpt-4o")
 ````
 
