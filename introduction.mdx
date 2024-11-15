@@ -3,7 +3,7 @@ title: Introduction
 description: 'Documentation for Sentinel, the supervision and evaluation system for agentic systems.'
 ---
 
-Sentinel is a Supervision and Evaluation platform for LLM based systems built by [Entropy Labs](http://entropy-labs.ai/). Sentinel allows you to supervise and evaluate agentic systems during experimentation to quickly iterate on your agent architecture. After experimentation, you can deploy your agent to production with Sentinel's supervisors that are monitoring for undesired behaviour, can intervene to correct the agent, terminate the agent or escalate to a human reviewer.
+Sentinel is a supervision and evaluation platform for LLM-based systems built by [Entropy Labs](http://entropy-labs.ai/). Sentinel allows you to supervise and evaluate agentic systems during experimentation to quickly iterate on your agent architecture. In production, Sentinel's supervisors can continue to monitor your agent and intervene to correct the agent's actions, terminate the agent or escalate an action to a human reviewer. 
 
 ## Sentinel Demo
 
@@ -24,17 +24,17 @@ Sentinel is a Supervision and Evaluation platform for LLM based systems built by
 Sentinel is designed to be used in a wide range of use cases to enhance reliability, safety and performance of agentic systems, including but not limited to:
 
 <AccordionGroup>
-  <Accordion title="Agents Experimentation">
+  <Accordion title="Agent Development">
     Supervise and evaluate agentic systems during experimentation to quickly iterate on your agent architecture.
-    - **Tool Call Supervision**: Fix failure modes by supervising tool calls. Supervisors can discover failure modes and improve the agent's behaviour.
+    - **Tool Call Supervision**: Identify and fix failure modes by supervising tool calls. Supervisors can help you discover failure modes and improve the agent's behaviour.
     - **LLM Response Mocking**: Reuse previous execution logs to mock function responses to test and reproduce results. Simulate LLM responses for unseen scenarios.
     - **Evaluations**: Build and run custom evaluations to score the performance of your agent.
   </Accordion>
   <Accordion title="Agents in Production">
-    Deploy your agent to production with Sentinel's supervisors that are monitoring for undesired behaviour, can intervene to correct the agent, terminate the agent or escalate to a human reviewer.
+    In production, Sentinel can be used to monitor for undesired behaviour, and can intervene to correct the agent *before* it executes actions that could be problematic.
     - **Tool Call Supervision**: Before the tool call is executed, the agent submits it to a supervisor for approval.
     - **LLM Response Mocking**: Reuse execution logs to mock function responses to test and reproduce results. Simulate LLM responses for unseen scenarios.
-    - **Evaluations**: Automatically create evaluations from your agent's execution logs and supervisors interventions.
+    - **Evaluations**: Automatically create evaluations from your agent's execution logs and supervisor's interventions.
  </Accordion>
 </AccordionGroup>
 
@@ -92,7 +92,7 @@ Sentinel currently provides three main types of supervisors for handling tool ca
       <ul>
         <li>--> Allows manual review and decision-making by a human.</li>
         <li>--> Useful for high risk scenarios requiring human judgment and oversight.</li>
-        <li>--> Supports 1 or more tool call suggestions per approval, allowing human to choose the best option.</li>
+        <li>--> Supports 1 or more tool call suggestions per approval, allowing a human to choose the best option.</li>
       </ul>
     </p>
   </Card>
@@ -109,9 +109,9 @@ Sentinel currently provides three main types of supervisors for handling tool ca
     </p>
   </Card>
 
-  <Card title="Deterministic Supervisor" icon="code">
+  <Card title="Code Supervisor" icon="code">
     <p>
-      A deterministic supervisor uses a predefined set of rules to determine the approval decision. This is useful for simple approval processes that are known ahead of time, such as whitelisting emails, commands, URLs, enforcing Regex patterns, etc.
+      A code-based supervisor can run arbitrary code to determine the approval decision. This could be useful for simple approval processes that are known ahead of time, such as whitelisting emails, commands, or URLs, or for more complex approval processes like those requiring custom classifiers or business logic. 
     </p>
   </Card>
 </CardGroup>
