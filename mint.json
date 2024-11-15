@@ -39,17 +39,22 @@
       "pages": [
         "introduction",
         "quickstart",
+        "main_Components",
         "development"
       ]
     },
     {
       "group": "Integrations",
       "pages": [
+        "openAI",
+        "langchain",
         {
           "group": "Inspect AI",
-          "pages": ["inspect-ai", "inspect_benchmarks"]
-        },
-        "langchain"
+          "pages": [
+            "inspect-ai",
+            "inspect_benchmarks"
+          ]
+        }
       ]
     }
   ],

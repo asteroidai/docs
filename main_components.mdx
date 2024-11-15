@@ -1,0 +1,256 @@
+---
+title: 'Main Components'
+description: 'Main components of the Entropy Labs package'
+---
+
+# Main Components of Entropy Labs Package
+
+The Entropy Labs package provides tools to build robust AI applications with supervision and evaluation capabilities. By integrating projects, tasks, runs, supervision functions, the `@supervise` decorator, and custom supervisors, you can create AI systems that are controllable, testable, and can involve human oversight.
+
+This section provides an overview of the main components of the Entropy Labs package, along with code examples to illustrate their usage.
+
+## Projects, Tasks, and Runs
+
+In the Entropy Labs framework, a **Project** is a container for tasks, which in turn contain runs. This hierarchy helps organize and track experiments and deployments.
+
+- **Project**: A container for tasks; it could represent an AI application or service.
+- **Task**: Represents a specific task or experiment within a project.
+- **Run**: A single execution instance of a task, which can be monitored and supervised.
+
+### Registering a Project, Task, and Run
+
+To register a project, task, and run, you can use the `register_project`, `register_task`, and `create_run` functions provided by the `entropy_labs` package.
+
+Here's how you can register all three in one Python snippet:
+
+```python
+from entropy_labs.api import register_project, register_task, create_run
+
+# Specify the backend URL for Entropy Labs (assuming it's running locally)
+entropy_labs_backend_url = "http://localhost:8080"
+
+# Register a project
+project_id = register_project(
+    project_name="My AI Assistant",
+    entropy_labs_backend_url=entropy_labs_backend_url
+)
+
+# Register a task within the project
+task_id = register_task(
+    project_id=project_id,
+    task_name="Assistant Conversation"
+)
+
+# Define the list of tools your agent will use
+tools = [tool1, tool2, tool3]  # Replace with your actual tool functions
+
+# Create a run for the task
+run_id = create_run(
+    project_id=project_id,
+    task_id=task_id,
+    tools=tools  # Provide the list of tool functions
+)
+```
+
+This code snippet demonstrates how to set up the project structure in Entropy Labs, allowing you to track and manage your AI application's executions.
+
+## The `@supervise` Decorator
+
+The `@supervise` decorator is a powerful feature that adds supervision functionality to your functions or tools. It allows you to:
+
+- **Enforce constraints and validations** during function execution.
+- **Mock function responses** for testing and development.
+- **Reuse previous execution logs** to simulate tool responses.
+
+### Usage
+
+You can use the `@supervise` decorator to wrap your functions and specify supervision functions, mock policies, and responses.
+
+```python
+from entropy_labs.supervision import supervise, MockPolicy
+
+@supervise(
+    supervision_functions=[supervisor_function],  # Replace with your supervisor functions
+    mock_policy=MockPolicy.NO_MOCK,  # Choose an appropriate mock policy
+    mock_responses=None  # Provide mock responses if needed
+)
+def my_function(args):
+    # Function implementation
+    pass
+```
+
+### Example
+
+Here's an example using the `@supervise` decorator to supervise a function:
+
+```python
+from entropy_labs.supervision import supervise, human_supervisor, llm_supervisor
+
+# Define a policy or instructions for the LLM supervisor
+EMAIL_POLICY = "Ensure that the email content is appropriate and follows company guidelines."
+
+@supervise(
+    supervision_functions=[
+        [llm_supervisor(instructions=EMAIL_POLICY)],  # First supervision chain
+        [human_supervisor()]  # Second supervision chain
+    ]
+)
+def send_email(to: str, subject: str, body: str):
+    """
+    Send an email to the specified recipient.
+
+    Parameters:
+        to (str): Recipient's email address.
+        subject (str): Subject of the email.
+        body (str): Body content of the email.
+    """
+    # Implement the email sending logic
+    pass
+```
+
+In this example, the `send_email` function is supervised by an LLM supervisor, which checks the email content according to the provided policy, and a human supervisor for final approval.
+
+## Updating Messages with `SupervisionContext`
+
+When working with OpenAI's chat models, you need to update the conversation history in the `SupervisionContext` so Sentinel can keep track of messages and facilitate supervision.
+
+Here's an example of how you can update the messages using the `SupervisionContext`:
+
+```python
+from entropy_labs.supervision.config import get_supervision_context
+from uuid import UUID
+from typing import List, Dict, Any
+
+def update_messages(
+    messages: List[Dict[str, Any]],
+    new_message: Dict[str, Any],
+    run_id: UUID
+) -> List[Dict[str, Any]]:
+    """
+    Update the conversation messages and supervision context.
+
+    Parameters:
+        messages (List[Dict[str, Any]]): The current list of messages.
+        new_message (Dict[str, Any]): The new message to add.
+        run_id (UUID): The ID of the current run.
+
+    Returns:
+        List[Dict[str, Any]]: The updated list of messages.
+    """
+    supervision_context = get_supervision_context(run_id)
+    supervision_context.update_openai_messages(messages + [new_message])
+    return messages + [new_message]
+```
+
+By updating the `SupervisionContext`, you ensure that the supervisors have access to the complete conversation history, which can be crucial for making informed decisions. We are working on more robust integration by wrapping the OpenAI client.
+
+## Building Custom Supervisors Using the `Supervisor` Protocol
+
+You can create custom supervisors by implementing the `Supervisor` protocol. This allows you to define custom logic for approving, rejecting, modifying, or escalating function execution.
+
+### The `Supervisor` Protocol
+
+The `Supervisor` protocol defines the expected signature for supervisor functions:
+
+```python
+from typing import Callable, Any, Dict, Optional, List
+from typing_extensions import Protocol
+from uuid import UUID
+from entropy_labs.supervision.config import SupervisionContext, SupervisionDecision
+
+class Supervisor(Protocol):
+    def __call__(
+        self,
+        func: Callable,
+        supervision_context: SupervisionContext,
+        ignored_attributes: List[str],
+        tool_args: List[Any],
+        tool_kwargs: Dict[str, Any],
+        supervision_request_id: Optional[UUID],
+        decision: Optional[SupervisionDecision] = None,
+        **kwargs
+    ) -> SupervisionDecision:
+        """Makes a decision based on the function, its arguments,
+        and the supervision context.
+        """
+        ...
+```
+
+### Creating a Custom Supervisor
+
+Here's an example of creating a custom supervisor that checks if an email address is in a whitelist:
+
+```python
+from typing import List, Callable, Any, Dict, Optional
+from uuid import UUID
+from entropy_labs.supervision.supervisors import Supervisor
+from entropy_labs.supervision.config import SupervisionDecision, SupervisionDecisionType, SupervisionContext
+
+def check_email_address_supervisor(whitelisted_emails: List[str]) -> Supervisor:
+    def supervisor(
+        func: Callable,
+        supervision_context: SupervisionContext,
+        ignored_attributes: List[str],
+        tool_args: List[Any],
+        tool_kwargs: Dict[str, Any],
+        supervision_request_id: Optional[UUID],
+        decision: Optional[SupervisionDecision] = None,
+        **kwargs
+    ) -> SupervisionDecision:
+        to_email = tool_kwargs.get('to')
+        if to_email in whitelisted_emails:
+            return SupervisionDecision(
+                decision=SupervisionDecisionType.APPROVE,
+                explanation=f"The email address '{to_email}' is allowed."
+            )
+        else:
+            return SupervisionDecision(
+                decision=SupervisionDecisionType.ESCALATE,
+                explanation=f"The email address '{to_email}' is not in the whitelist."
+            )
+    supervisor.__name__ = check_email_address_supervisor.__name__
+    supervisor.supervisor_attributes = {"whitelisted_emails": whitelisted_emails}
+    return supervisor
+```
+
+You can then use this custom supervisor in the `@supervise` decorator:
+
+```python
+@supervise(
+    supervision_functions=[
+        [check_email_address_supervisor(whitelisted_emails=['allowed@example.com'])]
+    ]
+)
+def send_email(to: str, subject: str, body: str):
+    # Function implementation
+    pass
+```
+
+## Human-in-the-Loop Using `human_supervisor`
+
+To involve human oversight in your application's decision-making process, you can use the `human_supervisor`. This supervisor escalates decisions to a human reviewer.
+
+### Using `human_supervisor`
+
+Here's how you can use the `human_supervisor` in your `@supervise` decorator:
+
+```python
+from entropy_labs.supervision.supervisors import human_supervisor
+
+@supervise(
+    supervision_functions=[
+        [human_supervisor(timeout=300)]  # Waits up to 300 seconds for human decision
+    ]
+)
+def sensitive_action(data):
+    # Function implementation
+    pass
+```
+
+When the `sensitive_action` function is called, it will pause execution until a human reviewer approves or rejects the action via the Entropy Labs supervision interface.
+
+## Conclusion
+
+By leveraging projects, tasks, runs, the `@supervise` decorator, custom supervisors, and human-in-the-loop supervision, you can build AI applications that are robust, secure, and compliant with organizational policies.
+
+The Entropy Labs package provides the tools you need to add supervision and evaluation capabilities to your AI systems, facilitating better control and testing.
