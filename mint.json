@@ -39,14 +39,14 @@
       "pages": [
         "introduction",
         "quickstart",
-        "main_Components",
+        "main_components",
         "development"
       ]
     },
     {
       "group": "Integrations",
       "pages": [
-        "openAI",
+        "openai",
         "langchain",
         {
           "group": "Inspect AI",
