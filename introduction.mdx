@@ -3,17 +3,43 @@ title: Introduction
 description: 'Documentation for Sentinel, the supervision and evaluation system for agentic systems.'
 ---
 
-Sentinel is an agent control plane built by [Entropy Labs](http://entropy-labs.ai/) that allows you to efficiently supervise and evaluate agentic systems.
+Sentinel is a Supervision and Evaluation platform for LLM based systems built by [Entropy Labs](http://entropy-labs.ai/). Sentinel allows you to supervise and evaluate agentic systems during experimentation to quickly iterate on your agent architecture. After experimentation, you can deploy your agent to production with Sentinel's supervisors that are monitoring for undesired behaviour, can intervene to correct the agent, terminate the agent or escalate to a human reviewer.
 
-<Frame>
-  <img
-    src="./images/hero.png"
-    alt="Video thumbnail showing editor"
-    width="100%"
-  />
-</Frame>
+## Sentinel Demo
 
-## How does it work? 
+<iframe
+  width="560"
+  height="315"
+  src="https://www.youtube.com/embed/pOfnYkdLk18?si=xufHV1Rrc7IRn2aq"
+  title="Sentinel Demo"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+></iframe>
+
+
+
+## Use Cases
+
+Sentinel is designed to be used in a wide range of use cases to enhance reliability, safety and performance of agentic systems, including but not limited to:
+
+<AccordionGroup>
+  <Accordion title="Agents Experimentation">
+    Supervise and evaluate agentic systems during experimentation to quickly iterate on your agent architecture.
+    - **Tool Call Supervision**: Fix failure modes by supervising tool calls. Supervisors can discover failure modes and improve the agent's behaviour.
+    - **LLM Response Mocking**: Reuse previous execution logs to mock function responses to test and reproduce results. Simulate LLM responses for unseen scenarios.
+    - **Evaluations**: Build and run custom evaluations to score the performance of your agent.
+  </Accordion>
+  <Accordion title="Agents in Production">
+    Deploy your agent to production with Sentinel's supervisors that are monitoring for undesired behaviour, can intervene to correct the agent, terminate the agent or escalate to a human reviewer.
+    - **Tool Call Supervision**: Before the tool call is executed, the agent submits it to a supervisor for approval.
+    - **LLM Response Mocking**: Reuse execution logs to mock function responses to test and reproduce results. Simulate LLM responses for unseen scenarios.
+    - **Evaluations**: Automatically create evaluations from your agent's execution logs and supervisors interventions.
+ </Accordion>
+</AccordionGroup>
+
+
+## Tool Call Supervisors
 
 Sentinel has an API that agents can call to submit actions for approval. The request is routed via a predefined list of **supervisors**. When presented when with an action, a supervisor can:
 
@@ -25,11 +51,39 @@ Sentinel has an API that agents can call to submit actions for approval. The req
 
 Finally, after the supervisors have made their decisions, the agent receives a response indicating the outcome of the approval process, which is either `approve`, `reject`, `modify`, or `terminate`. It is up to the agent's source code to handle these responses appropriately.
 
-## Supervisors
+### Parallel Supervision Chains
+Supervisors can be grouped into **supervision chains** which are executed in parallel. This allows for a fast and efficient approval process, where multiple supervisors can approve or reject an action at the same time. As a dummy example, you can create 2 supervisor chains that are attached to the `send_email()` tool:
 
-Sentinel currently provides two types of supervisors for handling tool call suggestions: Human and LLM (Large Language Model).
+**Supervision Chains Example - Send Email**
 
-<CardGroup>
+In this example, both supervisor chains need to approve the action before the agent can proceed. You can configure many more supervisors and chains as you see fit with different policies.
+<CardGroup cols={2}>
+  <Card title="Chain 1 - Check Email Domains and Content">
+    <Steps>
+      <Step title="Check Email Domains Supervisor">
+        Deterministic Supervisor that only allows emails to be sent to whitelisted domains: `['my-company.com', 'entropy-labs.ai']`
+      </Step>
+      <Step title="Check Email Content Supervisor">
+        LLM Supervisor that checks the email content for sensitive information and ensures it aligns with company policies.
+      </Step>
+    </Steps>
+  </Card>
+  <Card title="Chain 2 - Check Email Urgency and Risk">
+    <Steps>
+      <Step title="Check Email Urgency Supervisor">
+        LLM Supervisor that evaluates the urgency and importance of the email based on its content.
+      </Step>
+      <Step title="Check Email Risk Human Supervisor">
+        Human Supervisor to review and approve emails flagged as high-risk or requiring human judgment.
+      </Step>
+    </Steps>
+  </Card>
+</CardGroup>
+
+### Supervisor Types
+Sentinel currently provides three main types of supervisors for handling tool call supervision: Human, LLM (Large Language Model), and Deterministic. Each supervisor has a different use cases, can be highly customised or you can create completely custom supervisors.
+
+<CardGroup cols={3}>
   <Card title="Human Supervisor" icon="user-check">
     <p>
       A human reviews the tool call suggestion made by the agent and returns an approval decision.
@@ -54,18 +108,31 @@ Sentinel currently provides two types of supervisors for handling tool call sugg
       </ul>
     </p>
   </Card>
+
+  <Card title="Deterministic Supervisor" icon="code">
+    <p>
+      A deterministic supervisor uses a predefined set of rules to determine the approval decision. This is useful for simple approval processes that are known ahead of time, such as whitelisting emails, commands, URLs, enforcing Regex patterns, etc.
+    </p>
+  </Card>
 </CardGroup>
 
-See the [API Reference](/api) to see how to call the API endpoints associated with each supervisor.
 
-In the coming weeks we're planning to add support for more supervisors.
-
-### Custom Supervisors
-The vision for Sentinel is to allow for custom supervisors to be created and plugged in to the approval process. This will allow for a wide range of use cases, including but not limited to:
+#### Custom Supervisors
+Sentinel allows for custom supervisors to be created and plugged in to the approval process. This allows for a wide range of use cases, including but not limited to:
 - Integrating with existing approval workflows
 - Implementing specialized logic for certain types of actions
 
-Currently, this is not yet supported, but if you have specific approvals processes you'd like to build please reach out.
+
+
+
+
+## LLM Response Mocking 
+You can reuse previous execution logs to mock function responses, which is useful for testing and reproducing results. When mocking is enabled, the function will not execute its actual logic. Instead, it will behave according to the specified mock policy. You can mock function responses using different `MockPolicy` options.
+
+- **SAMPLE_LIST**: Returns a random element from `mock_responses`.
+- **SAMPLE_RANDOM**: Creates a random value matching the return type.
+- **SAMPLE_LLM**: Uses an LLM to generate a response.
+- **SAMPLE_PREVIOUS_CALLS**: Samples responses from previous executions.
 
 # Architecture
 
