@@ -9,20 +9,20 @@ This guide explains how to run any benchmark from Inspect AI using Entropy Labs'
 
 For setup instructions and details on how the approvers work and integrate, please refer to the [Inspect AI documentation](/inspect-ai).
 
-## Running Any Benchmark
+{/* ## Running Any Benchmark */}
 
-To run an evaluation with approval, you can run the following command:
-
+{/* To run an evaluation with approval, you can run the following command: */}
+{/* 
 ```bash
 inspect eval $eval_name --model $model --limit $limit --approval $approval_yaml
-```
+``` */}
 
-Replace the variables as follows:
+{/* Replace the variables as follows:
 
 - `$eval_name`: The name of the evaluation you want to run.
 - `$model`: The model you want to use (e.g., `openai/gpt-4o`).
 - `$limit`: The number of samples you want to run.
-- `$approval_yaml`: The path to your approval configuration YAML file.
+- `$approval_yaml`: The path to your approval configuration YAML file. */}
 
 You can find the list of available evaluations [here](https://inspect.ai-safety-institute.org.uk/examples/) or in the [Inspect AI repository](https://github.com/UKGovernmentBEIS/inspect_evals/tree/main/src/inspect_evals).
 
@@ -45,14 +45,14 @@ pip install git+https://github.com/UKGovernmentBEIS/inspect_evals
 The GDM In-House CTF evaluates general capabilities in a capture-the-flag setting.
 
 <Steps>
-
-<Step title="Navigate to the Benchmark Directory">
+<Step title="Run the GDM In-House CTF Evaluation">
 
 ```bash
-cd examples/inspect_evals/gdm_in_house_ctf
+python examples/inspect_evals/gdm_in_house_ctf/run.py
 ```
-
+This command will run the GDM In-House CTF evaluation with 2 samples and use the approval configuration specified in the `approval.yaml` file.
 </Step>
+
 
 <Step title="Set Up the Approval Configuration">
 Edit the `approval.yaml` file as needed. An example configuration:
@@ -83,13 +83,6 @@ approvers:
 
 </Step>
 
-<Step title="Run the GDM In-House CTF Evaluation">
-
-```bash
-inspect eval inspect_evals/gdm_in_house_ctf --model openai/gpt-4o --limit 10 --approval approval.yaml
-```
-This command will run the GDM In-House CTF evaluation with 10 samples and use the approval configuration specified in the `approval.yaml` file.
-</Step>
 
 
 </Steps>
@@ -104,16 +97,17 @@ Intercode CTF is another capability evaluation in a capture-the-flag format.
 
 <Steps>
 
-<Step title="Navigate to the Benchmark Directory">
+<Step title="Run the Intercode CTF Evaluation">
 
 ```bash
-cd examples/inspect_evals/intercode_ctf
+python examples/inspect_evals/intercode_ctf/run.py
 ```
-
+This command will run the Intercode CTF evaluation with 2 samples and use the approval configuration specified in the `approval.yaml` file.
 </Step>
 
-<Step title="Set Up the Approval Configuration">
-Edit the `approval.yaml` file. An example configuration:
+<Step title="Edit the Approval Configuration">
+You can edit Inspect evals configuration in `run.py`. Approval configuration can be configured in the `approval.yaml` file. An example configuration:
+
 
 ```yaml:examples/inspect_evals/intercode_ctf/approval.yaml
 approvers:
@@ -139,14 +133,6 @@ approvers:
     n: 2
 ```
 
-</Step>
-
-<Step title="Run the Intercode CTF Evaluation">
-
-```bash
-inspect eval inspect_evals/gdm_intercode_ctf --model openai/gpt-4o --limit 10 --approval approval.yaml
-```
-This command will run the Intercode CTF evaluation with 10 samples and use the approval configuration specified in the `approval.yaml` file.
 </Step>
 
 </Steps>
@@ -163,18 +149,18 @@ Note: Access to dataset `gaia-benchmark/GAIA` from Hugging Face is restricted. Y
 
 <Steps>
 
-<Step title="Navigate to the Benchmark Directory">
+<Step title="Run the GAIA Evaluation">
 
 ```bash
-cd examples/inspect_evals/gaia
+python examples/inspect_evals/gaia/run.py
 ```
-
+This command will run the GAIA evaluation with 2 samples and use the approval configuration specified in the `approval.yaml` file.
 </Step>
 
-<Step title="Set Up the Approval Configuration">
-Edit the `approval.yaml` file. An example configuration:
+<Step title="Edit the Approval Configuration">
+You can edit Inspect evals configuration in `run.py`. Approval configuration can be configured in the `approval.yaml` file. An example configuration:
 
-```yaml:examples/inspect_evals/intercode_ctf/approval.yaml
+```yaml:examples/inspect_evals/gaia/approval.yaml
 approvers:
   - name: entropy_labs/bash_approver
     tools: "*bash*"
@@ -200,13 +186,6 @@ approvers:
 
 </Step>
 
-<Step title="Run the GAIA Evaluation">
-
-```bash
-inspect eval inspect_evals/gaia --model openai/gpt-4o --limit 10 --approval approval.yaml
-```
-This command will run the GAIA evaluation with 10 samples and use the approval configuration specified in the `approval.yaml` file.
-</Step>
 
 </Steps>
 
