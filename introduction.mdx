@@ -3,7 +3,7 @@ title: Introduction
 description: 'Documentation for Sentinel, the supervision and evaluation system for agentic systems.'
 ---
 
-Sentinel is a supervision and evaluation platform for LLM-based systems built by [Entropy Labs](http://entropy-labs.ai/). Sentinel allows you to supervise and evaluate agentic systems during experimentation to quickly iterate on your agent architecture. In production, Sentinel's supervisors can continue to monitor your agent and intervene to correct the agent's actions, terminate the agent or escalate an action to a human reviewer. 
+Sentinel is a supervision and evaluation platform for LLM-based systems built by [Asteroid](https://asteroid.sh/). Sentinel allows you to supervise and evaluate agentic systems during experimentation to quickly iterate on your agent architecture. In production, Sentinel's supervisors can continue to monitor your agent and intervene to correct the agent's actions, terminate the agent or escalate an action to a human reviewer. 
 
 ## Sentinel Demo
 
@@ -61,7 +61,7 @@ In this example, both supervisor chains need to approve the action before the ag
   <Card title="Chain 1 - Check Email Domains and Content">
     <Steps>
       <Step title="Check Email Domains Supervisor">
-        Deterministic Supervisor that only allows emails to be sent to whitelisted domains: `['my-company.com', 'entropy-labs.ai']`
+        Deterministic Supervisor that only allows emails to be sent to whitelisted domains: `['my-company.com', 'asteroid.sh']`
       </Step>
       <Step title="Check Email Content Supervisor">
         LLM Supervisor that checks the email content for sensitive information and ensures it aligns with company policies.

@@ -1,17 +1,17 @@
 ---
 title: 'Main Components'
-description: 'Main components of the Entropy Labs package'
+description: 'Main components of the Asteroid AI package'
 ---
 
-# Main Components of Entropy Labs Package
+# Main Components of Asteroid AI Package
 
-The Entropy Labs package provides tools to build robust AI applications with supervision and evaluation capabilities. By integrating projects, tasks, runs, supervision functions, the `@supervise` decorator, and custom supervisors, you can create AI systems that are controllable, testable, and can involve human oversight.
+The Asteroid AI package provides tools to build robust AI applications with supervision and evaluation capabilities. By integrating projects, tasks, runs, supervision functions, the `@supervise` decorator, and custom supervisors, you can create AI systems that are controllable, testable, and can involve human oversight.
 
-This section provides an overview of the main components of the Entropy Labs package, along with code examples to illustrate their usage.
+This section provides an overview of the main components of the Asteroid AI package, along with code examples to illustrate their usage.
 
 ## Projects, Tasks, and Runs
 
-In the Entropy Labs framework, a **Project** is a container for tasks, which in turn contain runs. This hierarchy helps organize and track experiments and deployments.
+In the Asteroid AI framework, a **Project** is a container for tasks, which in turn contain runs. This hierarchy helps organize and track experiments and deployments.
 
 - **Project**: A container for tasks; it could represent an AI application or service.
 - **Task**: Represents a specific task or experiment within a project.
@@ -19,20 +19,20 @@ In the Entropy Labs framework, a **Project** is a container for tasks, which in 
 
 ### Registering a Project, Task, and Run
 
-To register a project, task, and run, you can use the `register_project`, `register_task`, and `create_run` functions provided by the `entropy_labs` package.
+To register a project, task, and run, you can use the `register_project`, `register_task`, and `create_run` functions provided by the `asteroid_ai` package.
 
 Here's how you can register all three in one Python snippet:
 
 ```python
-from entropy_labs.api import register_project, register_task, create_run
+from asteroid_ai.api import register_project, register_task, create_run
 
-# Specify the backend URL for Entropy Labs (assuming it's running locally)
-entropy_labs_backend_url = "http://localhost:8080"
+# Specify the backend URL for Asteroid AI (assuming it's running locally)
+asteroid_ai_backend_url = "http://localhost:8080"
 
 # Register a project
 project_id = register_project(
     project_name="My AI Assistant",
-    entropy_labs_backend_url=entropy_labs_backend_url
+    asteroid_ai_backend_url=asteroid_ai_backend_url
 )
 
 # Register a task within the project
@@ -52,7 +52,7 @@ run_id = create_run(
 )
 ```
 
-This code snippet demonstrates how to set up the project structure in Entropy Labs, allowing you to track and manage your AI application's executions.
+This code snippet demonstrates how to set up the project structure in Asteroid AI, allowing you to track and manage your AI application's executions.
 
 ## The `@supervise` Decorator
 
@@ -67,7 +67,7 @@ The `@supervise` decorator is a powerful feature that adds supervision functiona
 You can use the `@supervise` decorator to wrap your functions and specify supervision functions, mock policies, and responses.
 
 ```python
-from entropy_labs.supervision import supervise, MockPolicy
+from asteroid_ai.supervision import supervise, MockPolicy
 
 @supervise(
     supervision_functions=[supervisor_function],  # Replace with your supervisor functions
@@ -84,7 +84,7 @@ def my_function(args):
 Here's an example using the `@supervise` decorator to supervise a function:
 
 ```python
-from entropy_labs.supervision import supervise, human_supervisor, llm_supervisor
+from asteroid_ai.supervision import supervise, human_supervisor, llm_supervisor
 
 # Define a policy or instructions for the LLM supervisor
 EMAIL_POLICY = "Ensure that the email content is appropriate and follows company guidelines."
@@ -117,7 +117,7 @@ When working with OpenAI's chat models, you need to update the conversation hist
 Here's an example of how you can update the messages using the `SupervisionContext`:
 
 ```python
-from entropy_labs.supervision.config import get_supervision_context
+from asteroid_ai.supervision.config import get_supervision_context
 from uuid import UUID
 from typing import List, Dict, Any
 
@@ -156,7 +156,7 @@ The `Supervisor` protocol defines the expected signature for supervisor function
 from typing import Callable, Any, Dict, Optional, List
 from typing_extensions import Protocol
 from uuid import UUID
-from entropy_labs.supervision.config import SupervisionContext, SupervisionDecision
+from asteroid_ai.supervision.config import SupervisionContext, SupervisionDecision
 
 class Supervisor(Protocol):
     def __call__(
@@ -183,8 +183,8 @@ Here's an example of creating a custom supervisor that checks if an email addres
 ```python
 from typing import List, Callable, Any, Dict, Optional
 from uuid import UUID
-from entropy_labs.supervision.supervisors import Supervisor
-from entropy_labs.supervision.config import SupervisionDecision, SupervisionDecisionType, SupervisionContext
+from asteroid_ai.supervision.supervisors import Supervisor
+from asteroid_ai.supervision.config import SupervisionDecision, SupervisionDecisionType, SupervisionContext
 
 def check_email_address_supervisor(whitelisted_emails: List[str]) -> Supervisor:
     def supervisor(
@@ -235,7 +235,7 @@ To involve human oversight in your application's decision-making process, you ca
 Here's how you can use the `human_supervisor` in your `@supervise` decorator:
 
 ```python
-from entropy_labs.supervision.supervisors import human_supervisor
+from asteroid_ai.supervision.supervisors import human_supervisor
 
 @supervise(
     supervision_functions=[
@@ -247,10 +247,10 @@ def sensitive_action(data):
     pass
 ```
 
-When the `sensitive_action` function is called, it will pause execution until a human reviewer approves or rejects the action via the Entropy Labs supervision interface.
+When the `sensitive_action` function is called, it will pause execution until a human reviewer approves or rejects the action via the Asteroid AI supervision interface.
 
 ## Conclusion
 
 By leveraging projects, tasks, runs, the `@supervise` decorator, custom supervisors, and human-in-the-loop supervision, you can build AI applications that are robust, secure, and compliant with organizational policies.
 
-The Entropy Labs package provides the tools you need to add supervision and evaluation capabilities to your AI systems, facilitating better control and testing.
+The Asteroid AI package provides the tools you need to add supervision and evaluation capabilities to your AI systems, facilitating better control and testing.
