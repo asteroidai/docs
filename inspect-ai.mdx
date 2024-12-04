@@ -32,36 +32,28 @@ cd examples/inspect_example
 
 </Step>
 
-<Step title="Run the Example with Human Approval">
+<Step title="Run the Example with Multiple Approval Levels">
 
-Run the example using human approval for all tools:
+Run the example that uses `approval_escalation.yaml` for approvals configuration:
 
 ````bash
-inspect eval run.py --approval approval_human.yaml --model openai/gpt-4o --trace
+python run.py
 ````
 
 This command runs the example and triggers approvals. You can view the approvals at `http://localhost:3000`.
 </Step>
 
 <Step title="Change Approval Configuration">
-You can change the approval configuration by modifying the `approval_human.yaml` file. There are also allowlist examples in the `approval_escalation.yaml` file. To use this configuration:
+You can make changes to the `examples/inspect_example/run.py` file to try different models, more samples, or different approval configurations. For example, we provide 2 more approval configuration files in the `approval_human.yaml` and `approval_llm.yaml` files. Change the `approval_file_name` in `run.py` to use a different approval configuration file.
 
-````bash
-inspect eval run.py --approval approval_escalation.yaml --model openai/gpt-4o --trace
+````python:examples/inspect_example/run.py
+...
+if __name__ == "__main__":
+    approval_file_name = "approval_human.yaml"
+    ...
 ````
 
 </Step>
-
-<Step title="Run Multiple Agents">
-Entropy Labs server and frontend can be connected to multiple running agents. To try this, you can run the `agents.sh` helper script to run multiple agents in parallel inside a tmux window (requires [tmux](https://github.com/tmux/tmux/wiki)):
-
-````bash
-./agents.sh
-````
-
-This script will start a tmux session with multiple panes, each running a different agent (randomly sampled from the `run.py` script). You can change the number of agents to run by modifying the `PANE_COUNT` variable and change the model by modifying the `MODEL` variable in the script.
-</Step>
-
 </Steps>
 
 ## Approval Configuration
@@ -195,72 +187,15 @@ approvers:
 
 ## Inspect AI Example Code
 
-Below is the main example code that demonstrates how to use Inspect AI with approvals.
-
-````python:examples/inspect_example/run.py
-from pathlib import Path
-from inspect_ai import Task, eval, task
-from inspect_ai.dataset import Sample
-from inspect_ai.solver import generate, system_message, use_tools
-from inspect_ai.tool import bash, python
-import random
-import logging
-from entropy_labs.supervision.inspect_ai import _registry
-
-# Set up logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-@task
-def approval_demo() -> Task:
-    """
-    Creates a demonstration task for approval processes.
-    """
-    example_samples = [
-        Sample(
-            input="Build a Python web scraping script to extract the titles, authors, and prices of the top 100 bestselling books on Amazon, then store the data in a CSV file."
-        ),
-        # Additional sample tasks...
-    ]
-    return Task(
-        dataset=[random.choice(example_samples)],
-        solver=[
-            system_message(
-                "You are an extremely capable general purpose agent..."
-            ),
-            use_tools(bash(), python()),
-            generate(),
-        ],
-        sandbox="docker",
-    )
-
-if __name__ == "__main__":
-    approval = (Path(__file__).parent / "approval_human.yaml").as_posix()
-    eval(approval_demo(), approval=approval, trace=True, model="openai/gpt-4o")
-````
+It's necessary to first register projects, tasks and runs for the integration with Inspect AI to work correctly. Explore the `examples/inspect_example/run.py` file to see how the Inspect AI example works. 
 
 ## Editing Configurations
 
 You can customize the behavior of your agents by editing the approval YAML files and modifying the example code.
 
-### Changing the Approval File
-
-When running the example, you can specify a different approval configuration file using the `--approval` argument:
-
-````bash
-inspect eval run.py --approval approval_escalation.yaml --model openai/gpt-4o --trace
-````
-
 ### Modifying the Agent Script
 
 You can edit `run.py` to change the tasks, the tools used, and other aspects of the agent's behavior.
-
-## Using Different Models
-
-You can change the model used by specifying the `--model` argument when running the example:
-
-````bash
-inspect eval run.py --approval approval_human.yaml --model openai/gpt-4o-mini --trace
-````
 
 ## Additional Resources
 
