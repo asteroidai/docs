@@ -97,10 +97,17 @@ Intercode CTF is another capability evaluation in a capture-the-flag format.
 
 <Steps>
 
+<Step title="Navigate to the Intercode CTF Directory">
+
+```bash
+cd examples/inspect_evals/intercode_ctf
+```
+</Step>
+
 <Step title="Run the Intercode CTF Evaluation">
 
 ```bash
-python examples/inspect_evals/intercode_ctf/run.py
+python inspect eval run.py --approval approval.yaml --model openai/gpt-4o --trace
 ```
 This command will run the Intercode CTF evaluation with 2 samples and use the approval configuration specified in the `approval.yaml` file.
 </Step>
@@ -148,11 +155,17 @@ The GAIA (General AI Assistants) benchmark consists of 450 questions testing too
 Note: Access to dataset `gaia-benchmark/GAIA` from Hugging Face is restricted. You must have access to it and be authenticated to access it.
 
 <Steps>
+<Step title="Navigate to the GAIA Directory">
+
+```bash
+cd examples/inspect_evals/gaia
+```
+</Step>
 
 <Step title="Run the GAIA Evaluation">
 
 ```bash
-python examples/inspect_evals/gaia/run.py
+python inspect eval run.py --approval approval.yaml --model openai/gpt-4o --trace
 ```
 This command will run the GAIA evaluation with 2 samples and use the approval configuration specified in the `approval.yaml` file.
 </Step>
