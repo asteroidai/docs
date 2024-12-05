@@ -1,15 +1,15 @@
 ---
 title: LangChain
-description: Using Entropy Labs Supervision and Mocking with LangChain
+description: Using Asteroid AI Supervision and Mocking with LangChain
 ---
 
-# Using Entropy Labs Supervision and Mocking with LangChain
+# Using Asteroid AI Supervision and Mocking with LangChain
 
-This documentation provides an overview of how to use Entropy Labs' supervision and mocking tools with LangChain to build intelligent agents. By integrating supervision functions, mock policies, and the `@supervise` decorator, you can create robust AI applications that are both controllable and testable.
+This documentation provides an overview of how to use Asteroid AI's supervision and mocking tools with LangChain to build intelligent agents. By integrating supervision functions, mock policies, and the `@supervise` decorator, you can create robust AI applications that are both controllable and testable.
 
 ## Introduction
 
-Entropy Labs extends LangChain by introducing supervision and mocking capabilities, allowing developers to:
+Asteroid AI extends LangChain by introducing supervision and mocking capabilities, allowing developers to:
 
 - **Enforce constraints and validations** during function execution.
 - **Mock function responses** for testing and development.
@@ -51,7 +51,7 @@ A supervision function is a callable that takes the function and its arguments a
 #### Example Supervision Function
 
 ```python
-from el.supervision.config import SupervisionDecision, SupervisionDecisionType
+from asteroid_ai.supervision.config import SupervisionDecision, SupervisionDecisionType
 
 def divide_supervisor(func, *args, **kwargs):
     a, b = args
@@ -84,8 +84,8 @@ class MockPolicy(Enum):
 #### Example Usage
 
 ```python
-from el.supervision.decorators import supervise
-from el.mocking.policies import MockPolicy
+from asteroid_ai.supervision.decorators import supervise
+from asteroid_ai.mocking.policies import MockPolicy
 from langchain.tools import tool
 
 @tool
@@ -114,7 +114,7 @@ When mocking is enabled, the function will not execute its actual logic. Instead
 You can set global supervision functions that apply to all supervised functions using:
 
 ```python
-from el.supervision.config import set_global_supervision_functions
+from asteroid_ai.supervision.config import set_global_supervision_functions
 
 set_global_supervision_functions([global_supervisor_function])
 ```
@@ -124,8 +124,8 @@ set_global_supervision_functions([global_supervisor_function])
 Similarly, you can set a global mock policy:
 
 ```python
-from el.supervision.config import set_global_mock_policy
-from el.mocking.policies import MockPolicy
+from asteroid_ai.supervision.config import set_global_mock_policy
+from asteroid_ai.mocking.policies import MockPolicy
 
 set_global_mock_policy(MockPolicy.SAMPLE_PREVIOUS_CALLS, override_local_policy=True)
 ```
@@ -139,10 +139,10 @@ set_global_mock_policy(MockPolicy.SAMPLE_PREVIOUS_CALLS, override_local_policy=T
 In this example, we define a `divide` function that is supervised to prevent division by zero.
 
 ```python
-from el.supervision.config import set_global_supervision_functions
-from el.supervision.supervisors import divide_supervisor
-from el.supervision.langchain.supervisors import human_supervisor
-from el.supervision.decorators import supervise
+from asteroid_ai.supervision.config import set_global_supervision_functions
+from asteroid_ai.supervision.supervisors import divide_supervisor
+from asteroid_ai.supervision.langchain.supervisors import human_supervisor
+from asteroid_ai.supervision.decorators import supervise
 from langchain_openai import ChatOpenAI
 from langchain.tools import tool
 from langchain_core.messages import HumanMessage
@@ -186,8 +186,8 @@ if __name__ == "__main__":
 This example shows how to mock function responses using different `MockPolicy` options.
 
 ```python
-from el.supervision.decorators import supervise
-from el.mocking.policies import MockPolicy
+from asteroid_ai.supervision.decorators import supervise
+from asteroid_ai.mocking.policies import MockPolicy
 from langchain.tools import tool
 
 @tool
@@ -220,12 +220,12 @@ You can reuse previous execution logs to mock function responses, which is usefu
 ```python
 import os
 import glob
-from el.supervision.config import (
+from asteroid_ai.supervision.config import (
     set_global_mock_policy,
     setup_sample_from_previous_calls
 )
-from el.supervision.langchain.logging import EntropyLabsCallbackHandler
-from el.mocking.policies import MockPolicy
+from asteroid_ai.supervision.langchain.logging import AsteroidCallbackHandler
+from asteroid_ai.mocking.policies import MockPolicy
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 
@@ -263,7 +263,7 @@ if __name__ == "__main__":
     log_directory = ".logs/reuse_runs_example"
     
     # First run: Create logs
-    callbacks = [EntropyLabsCallbackHandler(
+    callbacks = [AsteroidCallbackHandler(
         tools=tools,
         log_directory=log_directory,
         single_log_file=True
@@ -291,4 +291,4 @@ if __name__ == "__main__":
 
 ## Conclusion
 
-Integrating supervision and mocking into your LangChain applications with Entropy Labs' tools allows you to build intelligent agents that are both robust and controllable. By leveraging the `@supervise` decorator, `MockPolicy`, and configuration options, you can enforce constraints, simulate function outputs, and reuse previous runs effectively.
+Integrating supervision and mocking into your LangChain applications with Asteroid AI's tools allows you to build intelligent agents that are both robust and controllable. By leveraging the `@supervise` decorator, `MockPolicy`, and configuration options, you can enforce constraints, simulate function outputs, and reuse previous runs effectively.

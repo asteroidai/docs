@@ -50,8 +50,13 @@ paths:
               properties:
                 name:
                   type: string
+                run_result_tags:
+                  type: array
+                  items:
+                    type: string
               required:
                 - name
+                - run_result_tags
       responses:
         "200":
           description: Project found
@@ -103,7 +108,7 @@ paths:
       tags:
         - Project
 
-  /api/project/{projectId}/run:
+  /api/project/{projectId}/tasks:
     parameters:
       - name: projectId
         in: path
@@ -112,8 +117,84 @@ paths:
           type: string
           format: uuid
     get:
-      summary: Get all runs for a project
-      operationId: GetProjectRuns
+      summary: Get all tasks for a project
+      operationId: GetProjectTasks
+      responses:
+        "200":
+          description: List of tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+        "404":
+          description: Project not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      tags:
+        - Task
+    post:
+      summary: Create a new task
+      operationId: CreateTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+              required:
+                - name
+      responses:
+        "201":
+          description: Task created
+          content:
+            application/json:
+              schema:
+                type: string
+                format: uuid
+      tags:
+        - Task
+
+  /api/task/{taskId}:
+    parameters:
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Get a task
+      operationId: GetTask
+      responses:
+        "200":
+          description: Task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+      tags:
+        - Task
+
+  /api/task/{taskId}/run:
+    parameters:
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Get all runs for a task
+      operationId: GetTaskRuns
       responses:
         "200":
           description: List of runs
@@ -126,8 +207,8 @@ paths:
       tags:
         - Run
     post:
-      summary: Create a new run for a project
-      operationId: CreateProjectRun
+      summary: Create a new run for a task
+      operationId: CreateRun
       responses:
         "201":
           description: Run created
@@ -447,6 +528,34 @@ paths:
       tags:
         - RequestGroup
 
+  /api/tool_request/{toolRequestId}:
+    parameters:
+      - name: toolRequestId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Get a tool request
+      operationId: GetToolRequest
+      responses:
+        "200":
+          description: Tool request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ToolRequest"
+        "404":
+          description: Tool request not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      tags:
+        - RequestGroup
+
+
   /api/tool/{toolId}:
     parameters:
       - name: toolId
@@ -658,6 +767,106 @@ paths:
       tags:
         - Run
 
+  /api/run/{runId}:
+    parameters:
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Get a run
+      operationId: GetRun
+      responses:
+        "200":
+          description: Run
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Run"
+        "404":
+          description: Run not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      tags:
+        - Run
+
+  /api/run/{runId}/status:
+    parameters:
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Get the status of a run
+      operationId: GetRunStatus
+      responses:
+        "200":
+          description: Run status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+        "404":
+          description: Run not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      tags:
+        - Run
+    put:
+      summary: Update the status of a run
+      operationId: UpdateRunStatus
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Status"
+      responses:
+        "204":
+          description: Run status updated
+      tags:
+        - Run
+
+  /api/run/{runId}/result:
+    parameters:
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      summary: Update a run with a result
+      operationId: UpdateRunResult
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                result:
+                  type: string
+      responses:
+        "201":
+          description: Run result created
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      tags:
+        - Run
+
   /api/stats:
     get:
       summary: Get hub stats
@@ -818,10 +1027,15 @@ components:
         created_at:
           type: string
           format: date-time
+        run_result_tags:
+          type: array
+          items:
+            type: string
       required:
         - name
         - created_at
         - id
+        - run_result_tags
 
     Run:
       type: object
@@ -829,15 +1043,19 @@ components:
         id:
           type: string
           format: uuid
-        project_id:
+        task_id:
           type: string
           format: uuid
         created_at:
           type: string
           format: date-time
+        status:
+          $ref: "#/components/schemas/Status"
+        result:
+          type: string
       required:
         - id
-        - project_id
+        - task_id
         - created_at
 
     Tool:
@@ -962,13 +1180,29 @@ components:
     Message:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
         role:
           $ref: "#/components/schemas/MessageRole"
         content:
           type: string
+        type:
+          description: The type of content in the message, either text or b64 encoded audio
+          $ref: "#/components/schemas/MessageType"
+        source:
+          type: string
+        tool_calls:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCall"
       required:
-        - role
         - content
+        - role
+
+    MessageType:
+      type: string
+      enum: [text, audio, image, image_url]
 
     Arguments:
       type: object
@@ -1057,7 +1291,7 @@ components:
         messages:
           type: array
           items:
-            $ref: "#/components/schemas/StateMessage"
+            $ref: "#/components/schemas/Message"
         tools:
           type: array
           items:
@@ -1079,27 +1313,6 @@ components:
         - tools
         - output
         - completed
-
-    StateMessage:
-      type: object
-      properties:
-        content:
-          type: string
-        role:
-          type: string
-        source:
-          type: string
-        tool_calls:
-          type: array
-          items:
-            $ref: "#/components/schemas/ToolCall"
-        tool_call_id:
-          type: string
-        function:
-          type: string
-      required:
-        - content
-        - role
 
     ToolChoice:
       type: object
@@ -1134,28 +1347,11 @@ components:
       type: object
       properties:
         message:
-          $ref: "#/components/schemas/AssistantMessage"
+          $ref: "#/components/schemas/Message"
         stop_reason:
           type: string
       required:
         - message
-
-    AssistantMessage:
-      type: object
-      properties:
-        content:
-          type: string
-        source:
-          type: string
-        role:
-          type: string
-        tool_calls:
-          type: array
-          items:
-            $ref: "#/components/schemas/ToolCall"
-      required:
-        - content
-        - role
 
     ToolCall:
       type: object
@@ -1253,3 +1449,25 @@ components:
         - chain_state
         - request_group
         - run_id
+
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - project_id
+        - name
+        - created_at
