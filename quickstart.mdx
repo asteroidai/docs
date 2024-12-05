@@ -3,21 +3,21 @@ title: 'Quickstart'
 description: 'Supervise and evaluate agentic systems'
 ---
 
-Sentinel can be used with any agent built in Python using the `asteroid_ai` Python SDK with Sentinel server and web interface which is hosted locally using Docker.
+Sentinel can be used with any agent built in Python using the `entropy-labs` Python SDK with Sentinel server and web interface which is hosted locally using Docker.
 
 <Steps>
   <Step title="Install dependencies">
-    Install the `asteroid_ai` Python SDK and other dependencies:
+    Install the `entropy-labs` Python SDK and other dependencies:
 
     ```bash
-    pip install asteroid_ai
+    pip install entropy-labs
     ```
   </Step>
   <Step title="Clone the repository">
     Clone the Sentinel repository to your local machine and navigate to the project directory:
 
     ```bash
-    git clone https://github.com/asteroidai/sentinel.git && cd sentinel
+    git clone https://github.com/EntropyLabsAI/sentinel.git && cd sentinel
     ```
   </Step>
   <Step title="Set up environment">
@@ -57,7 +57,7 @@ Sentinel can be used with any agent built in Python using the `asteroid_ai` Pyth
 
 ## Example Agent
 
-In this example, we will demonstrate how to create an AI assistant that can perform tasks such as searching the internet, sending emails, creating calendar events, and booking flights. We will use the `asteroid_ai` Python SDK to supervise tool executions with the `supervise()` decorator, ensuring compliance with specified policies or requiring human approval when necessary.
+In this example, we will demonstrate how to create an AI assistant that can perform tasks such as searching the internet, sending emails, creating calendar events, and booking flights. We will use the `entropy-labs` Python SDK to supervise tool executions with the `supervise()` decorator, ensuring compliance with specified policies or requiring human approval when necessary.
 
 ### Overview
 
@@ -100,7 +100,7 @@ def check_email_address_supervisor(whitelisted_emails: List[str]) -> Supervisor:
     return supervisor
 ```
 
-- **Built-in Supervisors**: We also use `llm_supervisor` and `human_supervisor` from the `asteroid_ai` SDK.
+- **Built-in Supervisors**: We also use `llm_supervisor` and `human_supervisor` from the `entropy-labs` SDK.
 
 #### 2. **Tools**
 

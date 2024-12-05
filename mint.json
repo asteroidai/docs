@@ -5,7 +5,7 @@
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
   },
-  "favicon": "/favicon.png",
+  "favicon": "/favicon.svg",
   "colors": {
     "primary": "#a3aab8",
     "light": "#bacef5",
@@ -18,12 +18,12 @@
   "topbarLinks": [
     {
       "name": "Support",
-      "url": "mailto:devs@asteroid.sh"
+      "url": "mailto:devs@entropy-labs.ai"
     }
   ],
   "topbarCtaButton": {
     "name": "GitHub",
-    "url": "https://github.com/asteroidai/sentinel"
+    "url": "https://github.com/EntropyLabsAI/sentinel"
   },
   "anchors": [
     {
@@ -59,6 +59,6 @@
     }
   ],
   "footerSocials": {
-    "github": "https://github.com/asteroidai/sentinel"
+    "github": "https://github.com/EntropyLabsAI/sentinel"
   }
 }

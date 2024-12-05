@@ -5,7 +5,7 @@ description: "Supervise and evaluate agentic systems using UK's AI Safety Instit
 
 # Getting Started with Inspect AI
 
-Inspect AI is a powerful open-source framework for large language model evaluations. This guide will help you get started with running examples, editing configurations, and understanding the main functionalities of using asteroid_ai's approvers together with Inspect.
+Inspect AI is a powerful open-source framework for large language model evaluations. This guide will help you get started with running examples, editing configurations, and understanding the main functionalities of using entropy labs' approvers together with Inspect.
 
 ## Running the Inspect AI Example
 
@@ -15,10 +15,10 @@ You can run the Inspect AI example to see how it works and understand how to use
 <Steps>
 
 <Step title="Install Dependencies">
-To get started, ensure that `inspect-ai` and `asteroid_ai` are installed in your Python environment:
+To get started, ensure that `inspect-ai` and `entropy-labs` are installed in your Python environment:
 
 ````bash
-pip install inspect-ai asteroid_ai --upgrade
+pip install inspect-ai entropy-labs --upgrade
 ````
 
 </Step>
@@ -62,13 +62,13 @@ Approvals in Inspect AI are configured using YAML files. Examples of approval co
 
 ### Using Approvers
 
-We follow the Inspect AI format for the approval configuration. Our approvers are in the `asteroid_ai` package. You can install the `asteroid_ai` package to get these approvers:
+We follow the Inspect AI format for the approval configuration. Our approvers are in the `entropy-labs` package. You can install the `entropy-labs` package to get these approvers:
 
 ````bash
-pip install asteroid_ai
+pip install entropy-labs
 ````
 
-Then, you can reference the approvers in the approval configuration using names like `asteroid_ai/human_approver`.
+Then, you can reference the approvers in the approval configuration using names like `entropy_labs/human_approver`.
 
 ### Approval Configuration Examples
 
@@ -78,7 +78,7 @@ The `approval_human.yaml` file configures human approval for all tools:
 
 ````yaml:examples/inspect_example/approval_human.yaml
 approvers:
-  - name: asteroid_ai/human_approver
+  - name: entropy_labs/human_approver
     tools: "*"
     approval_api_endpoint: "http://localhost:8080"
     agent_id: "my_sample_1_agent"
@@ -91,7 +91,7 @@ The `approval_llm.yaml` file configures approval using a Language Model. The LLM
 
 ````yaml:examples/inspect_example/approval_llm.yaml
 approvers:
-  - name: asteroid_ai/llm_approver
+  - name: entropy_labs/llm_approver
     tools: "*"
     instructions: |
       As an overseeing agent, please follow these guidelines for each LLM tool action:
@@ -113,14 +113,14 @@ In the `approval_escalation.yaml` example, approvals for bash and Python tools a
 
 ````yaml:examples/inspect_example/approval_escalation.yaml
 approvers:
-  - name: asteroid_ai/bash_approver
+  - name: entropy_labs/bash_approver
     tools: "*bash*"
     allowed_commands: ["ls", "cd", "pwd", "echo", "cat", "grep", "mkdir", "cp", "wget", "curl", "pip"]
     allow_sudo: false
     command_specific_rules:
       pip: ["install", "list", "show"]
 
-  - name: asteroid_ai/python_approver
+  - name: entropy_labs/python_approver
     tools: "*python*"
     allowed_modules: ["requests", "json", "csv", "datetime", "re", "math", "random", "time"]
     allowed_functions: ["print", "len", "range", "str", "int", "float", "list", "dict", "set", "tuple", "sum", "max", "min"]
@@ -128,7 +128,7 @@ approvers:
     sensitive_modules: ["os", "sys", "subprocess", "socket"]
     allow_system_state_modification: false
 
-  - name: asteroid_ai/human_approver
+  - name: entropy_labs/human_approver
     tools: "*"
     approval_api_endpoint: "http://localhost:8080"
     agent_id: "testing_agent"
