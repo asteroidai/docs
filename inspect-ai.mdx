@@ -56,6 +56,57 @@ if __name__ == "__main__":
 </Step>
 </Steps>
 
+
+## Registering Inspect AI Evaluations with Entropy Labs
+
+To integrate Inspect AI evaluations with Entropy Labs, it's necessary to register projects, tasks, and runs. This registration ensures that your evaluation is correctly tracked and managed within the Entropy Labs platform. Additionally, you can optionally use the Entropy Labs scorer to score the finished evaluation using the Entropy Labs UI.
+
+Here are the relevant additions to the the Inspect Task definition:
+
+```python
+from entropy_labs.api import register_inspect_samples_with_entropy_labs_solver, entropy_labs_web_ui_scorer
+
+...
+
+@task
+def approval_demo() -> Task:
+    ...
+    return Task(
+        dataset=...,
+        solver=[
+            register_inspect_samples_with_entropy_labs_solver(
+                project_name="inspect-example",
+                entropy_labs_backend_url="http://localhost:8080"
+            ),
+            ...
+        ],
+        scorer=entropy_labs_web_ui_scorer(),
+        sandbox="docker",
+    )
+)
+```
+
+**Explanation of the Additions**:
+
+- **Registering Samples with Entropy Labs**: `register_inspect_samples_with_entropy_labs_solver` function is necessary for correctly registering your evaluation with Entropy Labs. It should be added to the `solver` list in your `Task` definition.
+    ```python
+    register_inspect_samples_with_entropy_labs_solver(
+        project_name="inspect-example",
+        entropy_labs_backend_url="http://localhost:8080"
+    )
+    ```
+
+- **Using the Entropy Labs Scorer (Optional)**: The `entropy_labs_web_ui_scorer` function can be used to score the finished evaluation using the Entropy Labs UI. By setting the `scorer` parameter to `entropy_labs_web_ui_scorer()`, you enable scoring and feedback collection through the web interface.
+
+    ```python
+    scorer=entropy_labs_web_ui_scorer()
+    ```
+
+**Note**: Ensure that you have the Entropy Labs backend server running and accessible at the URL specified in `entropy_labs_backend_url`. This is typically `http://localhost:8080` when running locally.
+
+**By incorporating these functions into your code, you enable seamless integration with Entropy Labs, enhancing your ability to monitor, manage, and assess your Inspect AI evaluations.**
+
+
 ## Approval Configuration
 
 Approvals in Inspect AI are configured using YAML files. Examples of approval configurations are provided in the `approval_human.yaml`, `approval_llm.yaml`, and `approval_escalation.yaml` files.
@@ -184,10 +235,6 @@ approvers:
     tools: "*"
     # Additional configuration options
 ```` */}
-
-## Inspect AI Example Code
-
-It's necessary to first register projects, tasks and runs for the integration with Inspect AI to work correctly. Explore the `examples/inspect_example/run.py` file to see how the Inspect AI example works. 
 
 ## Editing Configurations
 
