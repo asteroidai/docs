@@ -37,7 +37,7 @@ cd examples/inspect_example
 Run the example that uses `approval_escalation.yaml` for approvals configuration:
 
 ````bash
-python run.py
+inspect eval run.py --approval approval_escalation.yaml --model openai/gpt-4o --trace
 ````
 
 This command runs the example and triggers approvals. You can view the approvals at `http://localhost:3000`.
