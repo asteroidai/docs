@@ -1,16 +1,16 @@
 ---
 title: 'OpenAI'
-description: 'Integrate Entropy Labs supervision into OpenAI-powered applications'
+description: 'Integrate Asteroid supervision into OpenAI-powered applications'
 ---
 
-# Integrating Entropy Labs SDK with OpenAI
+# Integrating Asteroid SDK with OpenAI
 
-In this guide, we'll explore how to integrate the Entropy Labs SDK with the OpenAI SDK to build AI applications that are not only powerful but also supervised and controllable. Integration with Entropy Labs is possible with a few lines of code.
+In this guide, we'll explore how to integrate the Asteroid SDK with the OpenAI SDK to build AI applications that are not only powerful but also supervised and controllable. Integration with Asteroid is possible with a few lines of code.
 
 
 ## Introduction
 
-This guide demonstrates how to use the Entropy Labs SDK with OpenAI, including how to create supervised tools, manage supervision contexts, and build assistant agents that interact with OpenAI's GPT models.
+This guide demonstrates how to use the Asteroid SDK with OpenAI, including how to create supervised tools, manage supervision contexts, and build assistant agents that interact with OpenAI's GPT models.
 
 ## Creating Supervised Tools
 
@@ -21,7 +21,7 @@ Supervised tools are functions wrapped with the `@supervise` decorator, allowing
 The `@supervise` decorator adds supervision capabilities to your functions. Place the supervisor decorator above the tool definition that you provide to OpenAI.
 
 ```python
-from entropy_labs.supervision import supervise
+from asteroid_sdk.supervision import supervise
 
 @supervise(supervision_functions=[...])
 def your_function(params):
@@ -30,42 +30,32 @@ def your_function(params):
 ```
 ### Interacting with OpenAI Models
 
-Use the OpenAI Chat Completion API to interact with the model. Example code:
+Use the OpenAI Chat Completion API with the Asteroid-wrapped client to interact with the model. Example code:
 
 ```python
-import openai
+from openai import OpenAI
+from asteroid_sdk.wrappers.openai import asteroid_openai_client, asteroid_init
 from typing import List, Dict, Any
 
-def chat_with_openai(messages: List[Dict[str, Any]], functions: List[Dict[str, Any]]):
-    response = openai.ChatCompletion.create(
+# Initialize OpenAI and Asteroid
+client = OpenAI()
+run_id = asteroid_init(project_name="AI Assistant")
+wrapped_client = asteroid_openai_client(client, run_id)
+
+def chat_with_openai(messages: List[Dict[str, Any]], tools: List[Dict[str, Any]]):
+    response = wrapped_client.chat.completions.create(
         model="gpt-4",
         messages=messages,
-        functions=functions,
-        function_call="auto",
+        tools=tools,
+        tool_choice="auto",
     )
     return response
 ```
 
-### Updating the Conversation Messages
-
-For the supervisor to have access to the conversation history, you need to update the supervision context. Example code:
-
-```python
-from entropy_labs.supervision.config import get_supervision_context
-from uuid import UUID
-from typing import List, Dict, Any
-
-def update_messages(
-    messages: List[Dict[str, Any]],
-    new_message: Dict[str, Any],
-    run_id: UUID
-) -> List[Dict[str, Any]]:
-    supervision_context = get_supervision_context(run_id)
-    supervision_context.update_openai_messages(messages + [new_message])
-    return messages + [new_message]
-```
-
-By updating the `SupervisionContext` with the latest messages, supervisors have access to the entire conversation history, allowing for informed decision-making.
+This example shows how to:
+1. Initialize the OpenAI client with Asteroid supervision
+2. Use the wrapped client to make chat completion requests
+3. Pass tools (instead of functions) to the API
 
 ## Example Application
 
@@ -74,13 +64,9 @@ Let's put everything together in an example where an assistant searches the inte
 
 ## Conclusion
 
-Integrating the Entropy Labs SDK with OpenAI models allows you to build AI applications with robust supervision capabilities. By defining supervised tools and managing the supervision context, you can ensure that your AI assistant operates within defined policies and involves human oversight when necessary.
+Integrating the Asteroid SDK with OpenAI models allows you to build AI applications with robust supervision capabilities. By defining supervised tools and managing the supervision context, you can ensure that your AI assistant operates within defined policies and involves human oversight when necessary.
 
 Key takeaways:
-
-- Use the `@supervise` decorator to add supervision to your functions.
 - Define supervisors to enforce policies or require human approval.
-- Manage the `SupervisionContext` to maintain state and message history.
-- Implement preprocessing functions to handle messages and tool arguments effectively.
-
-By following this guide, you're well on your way to creating supervised, reliable, and controllable AI applications using Entropy Labs and OpenAI.
+- Use the `@supervise` decorator to add supervision to your functions.
+- Wrap your OpenAI client with `asteroid_openai_client` to register all supervised functions and enable supervision.
