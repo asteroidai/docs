@@ -1,9 +1,9 @@
 ---
 title: Introduction
-description: 'Documentation for Sentinel, the supervision and evaluation system for agentic systems.'
+description: 'Documentation for Sentinel, the supervision system for agentic systems.'
 ---
 
-Sentinel is a supervision and evaluation platform for LLM-based systems built by [Entropy Labs](http://entropy-labs.ai/). Sentinel allows you to supervise and evaluate agentic systems during experimentation to quickly iterate on your agent architecture. In production, Sentinel's supervisors can continue to monitor your agent and intervene to correct the agent's actions, terminate the agent or escalate an action to a human reviewer. 
+Sentinel is a supervision platform for LLM-based systems built by [Asteroid](https://asteroid.ai/). It allows you to supervise and evaluate agentic systems during experimentation to quickly iterate on your agent architecture. In production, Sentinel's supervisors can continue to monitor your agent and intervene to correct the agent's actions, terminate the agent or escalate an action to a human reviewer. 
 
 ## Sentinel Demo
 
@@ -25,16 +25,16 @@ Sentinel is designed to be used in a wide range of use cases to enhance reliabil
 
 <AccordionGroup>
   <Accordion title="Agent Development">
-    Supervise and evaluate agentic systems during experimentation to quickly iterate on your agent architecture.
-    - **Tool Call Supervision**: Identify and fix failure modes by supervising tool calls. Supervisors can help you discover failure modes and improve the agent's behaviour.
+    Supervise agentic systems during experimentation and discover failure modes to quickly iterate on your agent architecture.
+    - **Tool Call Supervision**: Identify and fix failure modes by supervising tool calls.
+    - **Chat Supervision**: Supervise the chat responses and fix mistakes in the agent's responses.
     - **LLM Response Mocking**: Reuse previous execution logs to mock function responses to test and reproduce results. Simulate LLM responses for unseen scenarios.
-    - **Evaluations**: Build and run custom evaluations to score the performance of your agent.
   </Accordion>
   <Accordion title="Agents in Production">
-    In production, Sentinel can be used to monitor for undesired behaviour, and can intervene to correct the agent *before* it executes actions that could be problematic.
+    Monitor agentic systems in production and *intervene* to correct the agent *before* it executes actions that could be problematic.
     - **Tool Call Supervision**: Before the tool call is executed, the agent submits it to a supervisor for approval.
+    - **Chat Supervision**: Supervise the chat responses and fix mistakes in the agent's responses at runtime.
     - **LLM Response Mocking**: Reuse execution logs to mock function responses to test and reproduce results. Simulate LLM responses for unseen scenarios.
-    - **Evaluations**: Automatically create evaluations from your agent's execution logs and supervisor's interventions.
  </Accordion>
 </AccordionGroup>
 
@@ -61,7 +61,7 @@ In this example, both supervisor chains need to approve the action before the ag
   <Card title="Chain 1 - Check Email Domains and Content">
     <Steps>
       <Step title="Check Email Domains Supervisor">
-        Deterministic Supervisor that only allows emails to be sent to whitelisted domains: `['my-company.com', 'entropy-labs.ai']`
+        Deterministic Supervisor that only allows emails to be sent to whitelisted domains: `['my-company.com', 'asteroid.ai']`
       </Step>
       <Step title="Check Email Content Supervisor">
         LLM Supervisor that checks the email content for sensitive information and ensures it aligns with company policies.

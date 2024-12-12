@@ -1,17 +1,17 @@
 ---
 title: 'Main Components'
-description: 'Main components of the Entropy Labs package'
+description: 'Main components of the Asteroid package'
 ---
 
-# Main Components of Entropy Labs Package
+# Main Components of the Asteroid Package
 
-The Entropy Labs package provides tools to build robust AI applications with supervision and evaluation capabilities. By integrating projects, tasks, runs, supervision functions, the `@supervise` decorator, and custom supervisors, you can create AI systems that are controllable, testable, and can involve human oversight.
+The Asteroid package provides tools to build robust AI applications with supervision and evaluation capabilities. By integrating projects, tasks, runs, supervision functions, the `@supervise` decorator, and custom supervisors, you can create AI systems that are controllable, testable, and can involve human oversight.
 
-This section provides an overview of the main components of the Entropy Labs package, along with code examples to illustrate their usage.
+This section provides an overview of the main components of the Asteroid package, along with code examples to illustrate their usage.
 
 ## Projects, Tasks, and Runs
 
-In the Entropy Labs framework, a **Project** is a container for tasks, which in turn contain runs. This hierarchy helps organize and track experiments and deployments.
+In the Asteroid framework, a **Project** is a container for tasks, which in turn contain runs. This hierarchy helps organize and track experiments and deployments.
 
 - **Project**: A container for tasks; it could represent an AI application or service.
 - **Task**: Represents a specific task or experiment within a project.
@@ -19,40 +19,26 @@ In the Entropy Labs framework, a **Project** is a container for tasks, which in 
 
 ### Registering a Project, Task, and Run
 
-To register a project, task, and run, you can use the `register_project`, `register_task`, and `create_run` functions provided by the `entropy_labs` package.
+To register a project, task, and run, you can use the `asteroid_init` function provided by the `asteroid-sdk` package.
 
 Here's how you can register all three in one Python snippet:
 
 ```python
-from entropy_labs.api import register_project, register_task, create_run
+from asteroid_sdk.wrappers.openai import asteroid_openai_client, asteroid_init
+# Initialize the OpenAI client
+client = OpenAI()
 
-# Specify the backend URL for Entropy Labs (assuming it's running locally)
-entropy_labs_backend_url = "http://localhost:8080"
+# Important! For this to work, Asteroid server needs to be running, contact Asteroid to get access
+run_id = asteroid_init(project_name="Project 1",
+                       task_name="Task 1",
+                       run_name="Run 1")
 
-# Register a project
-project_id = register_project(
-    project_name="My AI Assistant",
-    entropy_labs_backend_url=entropy_labs_backend_url
-)
+# When you wrap the client, all supervised functions will be registered
+wrapped_client = asteroid_openai_client(client, run_id)
 
-# Register a task within the project
-task_id = register_task(
-    project_id=project_id,
-    task_name="Assistant Conversation"
-)
-
-# Define the list of tools your agent will use
-tools = [tool1, tool2, tool3]  # Replace with your actual tool functions
-
-# Create a run for the task
-run_id = create_run(
-    project_id=project_id,
-    task_id=task_id,
-    tools=tools  # Provide the list of tool functions
-)
 ```
 
-This code snippet demonstrates how to set up the project structure in Entropy Labs, allowing you to track and manage your AI application's executions.
+This code snippet demonstrates how to set up the project structure in Asteroid, allowing you to track and manage your AI application's executions.
 
 ## The `@supervise` Decorator
 
@@ -67,7 +53,7 @@ The `@supervise` decorator is a powerful feature that adds supervision functiona
 You can use the `@supervise` decorator to wrap your functions and specify supervision functions, mock policies, and responses.
 
 ```python
-from entropy_labs.supervision import supervise, MockPolicy
+from asteroid_sdk.supervision import supervise, MockPolicy
 
 @supervise(
     supervision_functions=[supervisor_function],  # Replace with your supervisor functions
@@ -84,7 +70,7 @@ def my_function(args):
 Here's an example using the `@supervise` decorator to supervise a function:
 
 ```python
-from entropy_labs.supervision import supervise, human_supervisor, llm_supervisor
+from asteroid_sdk.supervision import supervise, human_supervisor, llm_supervisor
 
 # Define a policy or instructions for the LLM supervisor
 EMAIL_POLICY = "Ensure that the email content is appropriate and follows company guidelines."
@@ -110,69 +96,35 @@ def send_email(to: str, subject: str, body: str):
 
 In this example, the `send_email` function is supervised by an LLM supervisor, which checks the email content according to the provided policy, and a human supervisor for final approval.
 
-## Updating Messages with `SupervisionContext`
-
-When working with OpenAI's chat models, you need to update the conversation history in the `SupervisionContext` so Sentinel can keep track of messages and facilitate supervision.
-
-Here's an example of how you can update the messages using the `SupervisionContext`:
-
-```python
-from entropy_labs.supervision.config import get_supervision_context
-from uuid import UUID
-from typing import List, Dict, Any
-
-def update_messages(
-    messages: List[Dict[str, Any]],
-    new_message: Dict[str, Any],
-    run_id: UUID
-) -> List[Dict[str, Any]]:
-    """
-    Update the conversation messages and supervision context.
-
-    Parameters:
-        messages (List[Dict[str, Any]]): The current list of messages.
-        new_message (Dict[str, Any]): The new message to add.
-        run_id (UUID): The ID of the current run.
-
-    Returns:
-        List[Dict[str, Any]]: The updated list of messages.
-    """
-    supervision_context = get_supervision_context(run_id)
-    supervision_context.update_openai_messages(messages + [new_message])
-    return messages + [new_message]
-```
-
-By updating the `SupervisionContext`, you ensure that the supervisors have access to the complete conversation history, which can be crucial for making informed decisions. We are working on more robust integration by wrapping the OpenAI client.
-
-## Building Custom Supervisors Using the `Supervisor` Protocol
+## Building Custom Supervisors Using the `ToolCallSupervisor` Protocol
 
 You can create custom supervisors by implementing the `Supervisor` protocol. This allows you to define custom logic for approving, rejecting, modifying, or escalating function execution.
 
-### The `Supervisor` Protocol
+### The `ToolCallSupervisor` Protocol
 
 The `Supervisor` protocol defines the expected signature for supervisor functions:
 
 ```python
-from typing import Callable, Any, Dict, Optional, List
-from typing_extensions import Protocol
+from typing import Optional, Protocol
 from uuid import UUID
-from entropy_labs.supervision.config import SupervisionContext, SupervisionDecision
+from openai import OpenAI
+from asteroid_sdk.supervision.config import SupervisionContext, SupervisionDecision
+from asteroid_sdk.types import Tool, ChatCompletionMessageToolCall
 
-class Supervisor(Protocol):
+class ToolCallSupervisor(Protocol):
+    """Protocol for tool call supervisors."""
+    
     def __call__(
         self,
-        func: Callable,
+        tool: Tool,
+        tool_call: ChatCompletionMessageToolCall,
         supervision_context: SupervisionContext,
-        ignored_attributes: List[str],
-        tool_args: List[Any],
-        tool_kwargs: Dict[str, Any],
-        supervision_request_id: Optional[UUID],
-        decision: Optional[SupervisionDecision] = None,
+        ignored_attributes: list[str] = [],
+        supervision_request_id: Optional[UUID] = None,
+        previous_decision: Optional[SupervisionDecision] = None,
         **kwargs
     ) -> SupervisionDecision:
-        """Makes a decision based on the function, its arguments,
-        and the supervision context.
-        """
+        """Makes a decision based on the tool call and supervision context."""
         ...
 ```
 
@@ -181,23 +133,25 @@ class Supervisor(Protocol):
 Here's an example of creating a custom supervisor that checks if an email address is in a whitelist:
 
 ```python
-from typing import List, Callable, Any, Dict, Optional
-from uuid import UUID
-from entropy_labs.supervision.supervisors import Supervisor
-from entropy_labs.supervision.config import SupervisionDecision, SupervisionDecisionType, SupervisionContext
+from typing import List
+from asteroid_sdk.types import Tool, ChatCompletionMessageToolCall
+from asteroid_sdk.supervision.config import SupervisionDecision, SupervisionDecisionType, SupervisionContext
+import json
 
-def check_email_address_supervisor(whitelisted_emails: List[str]) -> Supervisor:
+def check_email_address_supervisor(whitelisted_emails: List[str]) -> ToolCallSupervisor:
     def supervisor(
-        func: Callable,
+        tool: Tool,
+        tool_call: ChatCompletionMessageToolCall,
         supervision_context: SupervisionContext,
-        ignored_attributes: List[str],
-        tool_args: List[Any],
-        tool_kwargs: Dict[str, Any],
-        supervision_request_id: Optional[UUID],
-        decision: Optional[SupervisionDecision] = None,
+        ignored_attributes: list[str] = [],
+        supervision_request_id: Optional[UUID] = None,
+        previous_decision: Optional[SupervisionDecision] = None,
         **kwargs
     ) -> SupervisionDecision:
-        to_email = tool_kwargs.get('to')
+        # Parse the tool call arguments
+        args = json.loads(tool_call.function.arguments)
+        to_email = args.get('to')
+        
         if to_email in whitelisted_emails:
             return SupervisionDecision(
                 decision=SupervisionDecisionType.APPROVE,
@@ -208,6 +162,7 @@ def check_email_address_supervisor(whitelisted_emails: List[str]) -> Supervisor:
                 decision=SupervisionDecisionType.ESCALATE,
                 explanation=f"The email address '{to_email}' is not in the whitelist."
             )
+            
     supervisor.__name__ = check_email_address_supervisor.__name__
     supervisor.supervisor_attributes = {"whitelisted_emails": whitelisted_emails}
     return supervisor
@@ -235,7 +190,7 @@ To involve human oversight in your application's decision-making process, you ca
 Here's how you can use the `human_supervisor` in your `@supervise` decorator:
 
 ```python
-from entropy_labs.supervision.supervisors import human_supervisor
+from asteroid_sdk.supervision.supervisors import human_supervisor
 
 @supervise(
     supervision_functions=[
@@ -247,10 +202,10 @@ def sensitive_action(data):
     pass
 ```
 
-When the `sensitive_action` function is called, it will pause execution until a human reviewer approves or rejects the action via the Entropy Labs supervision interface.
+When the `sensitive_action` function is called, it will pause execution until a human reviewer approves or rejects the action via the Asteroid supervision interface.
 
 ## Conclusion
 
 By leveraging projects, tasks, runs, the `@supervise` decorator, custom supervisors, and human-in-the-loop supervision, you can build AI applications that are robust, secure, and compliant with organizational policies.
 
-The Entropy Labs package provides the tools you need to add supervision and evaluation capabilities to your AI systems, facilitating better control and testing.
+The Asteroid package provides the tools you need to add supervision and evaluation capabilities to your AI systems, facilitating better control and testing.

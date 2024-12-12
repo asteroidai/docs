@@ -1,15 +1,15 @@
 ---
 title: LangChain
-description: Using Entropy Labs Supervision and Mocking with LangChain
+description: Using Asteroid Supervision and Mocking with LangChain
 ---
 
-# Using Entropy Labs Supervision and Mocking with LangChain
+# Using Asteroid Supervision and Mocking with LangChain
 
-This documentation provides an overview of how to use Entropy Labs' supervision and mocking tools with LangChain to build intelligent agents. By integrating supervision functions, mock policies, and the `@supervise` decorator, you can create robust AI applications that are both controllable and testable.
+This documentation provides an overview of how to use Asteroid's supervision and mocking tools with LangChain to build intelligent agents. By integrating supervision functions, mock policies, and the `@supervise` decorator, you can create robust AI applications that are both controllable and testable.
 
 ## Introduction
 
-Entropy Labs extends LangChain by introducing supervision and mocking capabilities, allowing developers to:
+Asteroid extends LangChain by introducing supervision and mocking capabilities, allowing developers to:
 
 - **Enforce constraints and validations** during function execution.
 - **Mock function responses** for testing and development.
@@ -224,7 +224,7 @@ from el.supervision.config import (
     set_global_mock_policy,
     setup_sample_from_previous_calls
 )
-from el.supervision.langchain.logging import EntropyLabsCallbackHandler
+from el.supervision.langchain.logging import AsteroidCallbackHandler
 from el.mocking.policies import MockPolicy
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
@@ -263,7 +263,7 @@ if __name__ == "__main__":
     log_directory = ".logs/reuse_runs_example"
     
     # First run: Create logs
-    callbacks = [EntropyLabsCallbackHandler(
+    callbacks = [AsteroidCallbackHandler(
         tools=tools,
         log_directory=log_directory,
         single_log_file=True
@@ -291,4 +291,4 @@ if __name__ == "__main__":
 
 ## Conclusion
 
-Integrating supervision and mocking into your LangChain applications with Entropy Labs' tools allows you to build intelligent agents that are both robust and controllable. By leveraging the `@supervise` decorator, `MockPolicy`, and configuration options, you can enforce constraints, simulate function outputs, and reuse previous runs effectively.
+Integrating supervision and mocking into your LangChain applications with Asteroid's tools allows you to build intelligent agents that are both robust and controllable. By leveraging the `@supervise` decorator, `MockPolicy`, and configuration options, you can enforce constraints, simulate function outputs, and reuse previous runs effectively.

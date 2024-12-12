@@ -3,21 +3,21 @@ title: 'Quickstart'
 description: 'Supervise and evaluate agentic systems'
 ---
 
-Sentinel can be used with any agent built in Python using the `entropy-labs` Python SDK with Sentinel server and web interface which is hosted locally using Docker.
+Sentinel can be used with any agent built in Python using the `asteroid-sdk` Python SDK with Sentinel server and web interface which is hosted locally using Docker.
 
 <Steps>
   <Step title="Install dependencies">
-    Install the `entropy-labs` Python SDK and other dependencies:
+    Install the `asteroid-sdk` Python SDK and other dependencies:
 
     ```bash
-    pip install entropy-labs
+    pip install asteroid-sdk
     ```
   </Step>
   <Step title="Clone the repository">
     Clone the Sentinel repository to your local machine and navigate to the project directory:
 
     ```bash
-    git clone https://github.com/EntropyLabsAI/sentinel.git && cd sentinel
+    git clone https://github.com/asteroidai/sentinel && cd sentinel
     ```
   </Step>
   <Step title="Set up environment">
@@ -48,7 +48,7 @@ Sentinel can be used with any agent built in Python using the `entropy-labs` Pyt
     ```bash
     python examples/openai/run.py
     ```
-    This will start the example with an AI assistant that can perform tasks like searching the internet, sending emails, creating calendar events, and booking flights. Entropy Labs Supervisors are used to supervise these tool executions. This example is described in more detail below.
+    This will start the example with an AI assistant that can perform tasks like searching the internet, sending emails, creating calendar events, and booking flights. Asteroid Supervisors are used to supervise these tool executions. This example is described in more detail below.
   </Step>
   <Step>
     If you prefer using Jupyter notebooks and want to see the example in more detail with explanations, you can run an example in `examples/openai/run.ipynb`.
@@ -57,7 +57,7 @@ Sentinel can be used with any agent built in Python using the `entropy-labs` Pyt
 
 ## Example Agent
 
-In this example, we will demonstrate how to create an AI assistant that can perform tasks such as searching the internet, sending emails, creating calendar events, and booking flights. We will use the `entropy-labs` Python SDK to supervise tool executions with the `supervise()` decorator, ensuring compliance with specified policies or requiring human approval when necessary.
+In this example, we will demonstrate how to create an AI assistant that can perform tasks such as searching the internet, sending emails, creating calendar events, and booking flights. We will use the `asteroid-sdk` Python SDK to supervise tool executions with the `supervise()` decorator, ensuring compliance with specified policies or requiring human approval when necessary.
 
 ### Overview
 
@@ -100,7 +100,7 @@ def check_email_address_supervisor(whitelisted_emails: List[str]) -> Supervisor:
     return supervisor
 ```
 
-- **Built-in Supervisors**: We also use `llm_supervisor` and `human_supervisor` from the `entropy-labs` SDK.
+- **Built-in Supervisors**: We also use `llm_supervisor` and `human_supervisor` from the `asteroid-sdk`.
 
 #### 2. **Tools**
 
@@ -118,7 +118,7 @@ def internet_search(query: str, max_results: int = 3) -> str:
 
 ```python
 @supervise(supervision_functions=[
-    [check_email_address_supervisor(whitelisted_emails=[ENTROPY_LABS_EMAIL])],
+    [check_email_address_supervisor(whitelisted_emails=[ASTEROID_EMAIL])],
     [llm_supervisor(instructions=EMAIL_INVITATION_POLICY), human_supervisor()]
 ])
 def send_email(to: str, subject: str, body: str):
@@ -184,6 +184,8 @@ def start_chatbot(
 We set up the environment and start the assistant.
 
 ```python
+from asteroid_sdk.wrappers.openai import asteroid_openai_client, asteroid_init
+
 # Define the initial prompt for the chatbot
 start_prompt = (
     "Go and find the most interesting events happening in AI next week in San Francisco. "
@@ -200,16 +202,16 @@ tools = [
     book_flight
 ]
 
-# Register project, task, and run with Entropy Labs
-project_id = register_project(
-    project_name="Email Assistant",
-    entropy_labs_backend_url="http://localhost:8080"
-)
-task_id = register_task(project_id=project_id, task_name="Email Assistant")
-run_id = create_run(project_id=project_id, task_id=task_id, tools=tools)
+# Initialize the OpenAI client
+client = OpenAI()
+
+# Important! For this to work, Asteroid server needs to be running, contact Asteroid to get access
+run_id = asteroid_init(project_name="Email Assistant")
+# When you wrap the client, all supervised functions will be registered
+wrapped_client = asteroid_openai_client(client, run_id)
 
 # Start the chatbot
-start_chatbot(start_prompt, tools, run_id, output, input_box)
+start_chatbot(start_prompt, tools, run_id, wrapped_client)
 ```
 
 ### Supervising the Agent in Real-Time
