@@ -1,17 +1,17 @@
 ---
 title: Introduction
-description: 'Documentation for Sentinel, the supervision system for agentic systems.'
+description: 'Documentation for Asteroid, the supervision and evaluation system for agentic systems.'
 ---
 
-Sentinel is a supervision platform for LLM-based systems built by [Asteroid](https://asteroid.ai/). It allows you to supervise and evaluate agentic systems during experimentation to quickly iterate on your agent architecture. In production, Sentinel's supervisors can continue to monitor your agent and intervene to correct the agent's actions, terminate the agent or escalate an action to a human reviewer. 
+Asteroid is a supervision and evaluation platform for LLM-based systems built by [Asteroid](http://asteroid.ai/). Asteroid allows you to supervise and evaluate agentic systems during experimentation to quickly iterate on your agent architecture. In production, Asteroid's supervisors can continue to monitor your agent and intervene to correct the agent's actions, terminate the agent or escalate an action to a human reviewer. 
 
-## Sentinel Demo
+## Asteroid Demo
 
 <iframe
   width="560"
   height="315"
   src="https://www.youtube.com/embed/pOfnYkdLk18?si=xufHV1Rrc7IRn2aq"
-  title="Sentinel Demo"
+  title="Asteroid Demo"
   frameborder="0"
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
   allowfullscreen
@@ -21,7 +21,7 @@ Sentinel is a supervision platform for LLM-based systems built by [Asteroid](htt
 
 ## Use Cases
 
-Sentinel is designed to be used in a wide range of use cases to enhance reliability, safety and performance of agentic systems, including but not limited to:
+Asteroid is designed to be used in a wide range of use cases to enhance reliability, safety and performance of agentic systems, including but not limited to:
 
 <AccordionGroup>
   <Accordion title="Agent Development">
@@ -31,7 +31,7 @@ Sentinel is designed to be used in a wide range of use cases to enhance reliabil
     - **LLM Response Mocking**: Reuse previous execution logs to mock function responses to test and reproduce results. Simulate LLM responses for unseen scenarios.
   </Accordion>
   <Accordion title="Agents in Production">
-    Monitor agentic systems in production and *intervene* to correct the agent *before* it executes actions that could be problematic.
+    In production, Asteroid can be used to monitor for undesired behaviour, and can intervene to correct the agent *before* it executes actions that could be problematic.
     - **Tool Call Supervision**: Before the tool call is executed, the agent submits it to a supervisor for approval.
     - **Chat Supervision**: Supervise the chat responses and fix mistakes in the agent's responses at runtime.
     - **LLM Response Mocking**: Reuse execution logs to mock function responses to test and reproduce results. Simulate LLM responses for unseen scenarios.
@@ -41,7 +41,7 @@ Sentinel is designed to be used in a wide range of use cases to enhance reliabil
 
 ## Tool Call Supervisors
 
-Sentinel has an API that agents can call to submit actions for approval. The request is routed via a predefined list of **supervisors**. When presented when with an action, a supervisor can:
+Asteroid has an API that agents can call to submit actions for approval. The request is routed via a predefined list of **supervisors**. When presented when with an action, a supervisor can:
 
 - `approve` The action is safe and the agent can proceed.
 - `reject` The action is unsafe and should not be executed, but the agent can continue.
@@ -81,7 +81,7 @@ In this example, both supervisor chains need to approve the action before the ag
 </CardGroup>
 
 ### Supervisor Types
-Sentinel currently provides three main types of supervisors for handling tool call supervision: Human, LLM (Large Language Model), and Deterministic. Each supervisor has a different use cases, can be highly customised or you can create completely custom supervisors.
+Asteroid currently provides three main types of supervisors for handling tool call supervision: Human, LLM (Large Language Model), and Deterministic. Each supervisor has a different use cases, can be highly customised or you can create completely custom supervisors.
 
 <CardGroup cols={3}>
   <Card title="Human Supervisor" icon="user-check">
@@ -118,7 +118,7 @@ Sentinel currently provides three main types of supervisors for handling tool ca
 
 
 #### Custom Supervisors
-Sentinel allows for custom supervisors to be created and plugged in to the approval process. This allows for a wide range of use cases, including but not limited to:
+Asteroid allows for custom supervisors to be created and plugged in to the approval process. This allows for a wide range of use cases, including but not limited to:
 - Integrating with existing approval workflows
 - Implementing specialized logic for certain types of actions
 
@@ -136,15 +136,15 @@ You can reuse previous execution logs to mock function responses, which is usefu
 
 # Architecture
 
-Sentinel uses a simple client-server architecture. The client is a React application that displays information related to agents and their supervision to human operators. The server is a Go application that handles the API requests from the agent and routes them to the appropriate supervisor. Supervisors can be configured via the UI.
+Asteroid uses a simple client-server architecture. The client is a React application that displays information related to agents and their supervision to human operators. The server is a Go application that handles the API requests from the agent and routes them to the appropriate supervisor. Supervisors can be configured via the UI.
 
-Consider the following diagram for a high level overview of how Sentinel works in the case of the Human Supervisor:
+Consider the following diagram for a high level overview of how Asteroid works in the case of the Human Supervisor:
 
 ```mermaid
 graph TD;
-A[Agent]-->|submit review|B[Sentinel Server];
+A[Agent]-->|submit review|B[Asteroid Server];
 A-->|poll status|B;
-B-->|submit review|C[Sentinel UI];
+B-->|submit review|C[Asteroid UI];
 C-->|reviewer response|B;
 ```
 

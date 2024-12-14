@@ -1,11 +1,11 @@
 ---
 title: 'Inspect Benchmarks'
-description: "Run any Inspect benchmark with Entropy Labs' approvers."
+description: "Run any Inspect benchmark with Asteroid' approvers."
 ---
 
-# Running Inspect AI Benchmarks with Entropy Labs' Approvers
+# Running Inspect AI Benchmarks with Asteroid' Approvers
 
-This guide explains how to run any benchmark from Inspect AI using Entropy Labs' approvers. We'll provide specific examples for benchmarks like InterCode: Capture the Flag or GAIA and show how to configure approvals for these evaluations.
+This guide explains how to run any benchmark from Inspect AI using Asteroid' approvers. We'll provide specific examples for benchmarks like InterCode: Capture the Flag or GAIA and show how to configure approvals for these evaluations.
 
 For setup instructions and details on how the approvers work and integrate, please refer to the [Inspect AI documentation](/inspect-ai).
 
@@ -59,14 +59,14 @@ Edit the `approval.yaml` file as needed. An example configuration:
 
 ```yaml:examples/inspect_evals/gdm_in_house_ctf/approval.yaml
 approvers:
-  - name: entropy_labs/bash_approver
+  - name: asteroid_sdk/bash_approver
     tools: "*bash*"
     allowed_commands: ["ls", "cd", "pwd", "echo", "cat", "grep", "mkdir", "cp", "wget", "curl", "pip"]
     allow_sudo: false
     command_specific_rules:
       pip: ["install", "list", "show"]
 
-  - name: entropy_labs/python_approver
+  - name: asteroid_sdk/python_approver
     tools: "*python*"
     allowed_modules: ["requests", "json", "csv", "datetime", "re", "math", "random", "time"]
     allowed_functions: ["print", "len", "range", "str", "int", "float", "list", "dict", "set", "tuple", "sum", "max", "min"]
@@ -74,7 +74,7 @@ approvers:
     sensitive_modules: ["os", "sys", "subprocess", "socket"]
     allow_system_state_modification: false
 
-  - name: entropy_labs/human_approver
+  - name: asteroid_sdk/human_approver
     tools: "*"
     approval_api_endpoint: "http://localhost:8080"
     agent_id: "testing_agent"
@@ -118,14 +118,14 @@ You can edit Inspect evals configuration in `run.py`. Approval configuration can
 
 ```yaml:examples/inspect_evals/intercode_ctf/approval.yaml
 approvers:
-  - name: entropy_labs/bash_approver
+  - name: asteroid_sdk/bash_approver
     tools: "*bash*"
     allowed_commands: ["ls", "cd", "pwd", "echo", "cat", "grep", "mkdir", "cp", "wget", "curl", "pip"]
     allow_sudo: false
     command_specific_rules:
       pip: ["install", "list", "show"]
 
-  - name: entropy_labs/python_approver
+  - name: asteroid_sdk/python_approver
     tools: "*python*"
     allowed_modules: ["requests", "json", "csv", "datetime", "re", "math", "random", "time"]
     allowed_functions: ["print", "len", "range", "str", "int", "float", "list", "dict", "set", "tuple", "sum", "max", "min"]
@@ -133,7 +133,7 @@ approvers:
     sensitive_modules: ["os", "sys", "subprocess", "socket"]
     allow_system_state_modification: false
 
-  - name: entropy_labs/human_approver
+  - name: asteroid_sdk/human_approver
     tools: "*"
     approval_api_endpoint: "http://localhost:8080"
     agent_id: "testing_agent"
@@ -175,14 +175,14 @@ You can edit Inspect evals configuration in `run.py`. Approval configuration can
 
 ```yaml:examples/inspect_evals/gaia/approval.yaml
 approvers:
-  - name: entropy_labs/bash_approver
+  - name: asteroid_sdk/bash_approver
     tools: "*bash*"
     allowed_commands: ["ls", "cd", "pwd", "echo", "cat", "grep", "mkdir", "cp", "wget", "curl", "pip"]
     allow_sudo: false
     command_specific_rules:
       pip: ["install", "list", "show"]
 
-  - name: entropy_labs/python_approver
+  - name: asteroid_sdk/python_approver
     tools: "*python*"
     allowed_modules: ["requests", "json", "csv", "datetime", "re", "math", "random", "time"]
     allowed_functions: ["print", "len", "range", "str", "int", "float", "list", "dict", "set", "tuple", "sum", "max", "min"]
@@ -190,7 +190,7 @@ approvers:
     sensitive_modules: ["os", "sys", "subprocess", "socket"]
     allow_system_state_modification: false
 
-  - name: entropy_labs/human_approver
+  - name: asteroid_sdk/human_approver
     tools: "*"
     approval_api_endpoint: "http://localhost:8080"
     agent_id: "testing_agent"

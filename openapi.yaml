@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: Sentinel API
+  title: Asteroid API
   version: 1.0.0
 
 paths:
@@ -1047,7 +1047,7 @@ components:
 
     SupervisorType:
       type: string
-      description: The type of supervisor. ClientSupervisor means that the supervision is done client side and the server is merely informed. Other supervisor types are handled serverside, e.g. HumanSupervisor means that a human will review the request via the Sentinel UI.
+      description: The type of supervisor. ClientSupervisor means that the supervision is done client side and the server is merely informed. Other supervisor types are handled serverside, e.g. HumanSupervisor means that a human will review the request via the Asteroid UI.
       enum: [client_supervisor, human_supervisor, no_supervisor]
 
     # Task State Begin

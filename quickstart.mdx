@@ -3,7 +3,7 @@ title: 'Quickstart'
 description: 'Supervise and evaluate agentic systems'
 ---
 
-Sentinel can be used with any agent built in Python using the `asteroid-sdk` Python SDK with Sentinel server and web interface which is hosted locally using Docker.
+Asteroid can be used with any agent built in Python using the `asteroid-sdk` Python SDK with Asteroid server and web interface which is hosted locally using Docker.
 
 <Steps>
   <Step title="Install dependencies">
@@ -14,10 +14,10 @@ Sentinel can be used with any agent built in Python using the `asteroid-sdk` Pyt
     ```
   </Step>
   <Step title="Clone the repository">
-    Clone the Sentinel repository to your local machine and navigate to the project directory:
+    Clone the Asteroid repository to your local machine and navigate to the project directory:
 
     ```bash
-    git clone https://github.com/asteroidai/sentinel && cd sentinel
+    git clone https://github.com/asteroidai/asteroid.git && cd asteroid
     ```
   </Step>
   <Step title="Set up environment">
@@ -66,7 +66,7 @@ The assistant agent is designed to:
 - Interact with the user and understand their requests.
 - Use tools to perform specific actions like searching the internet or sending emails.
 - Utilize the `supervise()` decorator to supervise tool executions.
-- Allow supervision and approval of actions in real-time through the Sentinel web interface.
+- Allow supervision and approval of actions in real-time through the Asteroid web interface.
 
 ### Key Components
 
@@ -100,7 +100,11 @@ def check_email_address_supervisor(whitelisted_emails: List[str]) -> Supervisor:
     return supervisor
 ```
 
+<<<<<<< Updated upstream
 - **Built-in Supervisors**: We also use `llm_supervisor` and `human_supervisor` from the `asteroid-sdk`.
+=======
+- **Built-in Supervisors**: We also use `llm_supervisor` and `human_supervisor` from the `asteroid-sdk` SDK.
+>>>>>>> Stashed changes
 
 #### 2. **Tools**
 
@@ -202,6 +206,7 @@ tools = [
     book_flight
 ]
 
+<<<<<<< Updated upstream
 # Initialize the OpenAI client
 client = OpenAI()
 
@@ -209,6 +214,15 @@ client = OpenAI()
 run_id = asteroid_init(project_name="Email Assistant")
 # When you wrap the client, all supervised functions will be registered
 wrapped_client = asteroid_openai_client(client, run_id)
+=======
+# Register project, task, and run with Asteroid
+project_id = register_project(
+    project_name="Email Assistant",
+    asteroid_sdk_backend_url="http://localhost:8080"
+)
+task_id = register_task(project_id=project_id, task_name="Email Assistant")
+run_id = create_run(project_id=project_id, task_id=task_id, tools=tools)
+>>>>>>> Stashed changes
 
 # Start the chatbot
 start_chatbot(start_prompt, tools, run_id, wrapped_client)
@@ -216,9 +230,9 @@ start_chatbot(start_prompt, tools, run_id, wrapped_client)
 
 ### Supervising the Agent in Real-Time
 
-With the Sentinel web interface running at `http://localhost:3000`, you can supervise the agent's actions in real-time.
+With the Asteroid web interface running at `http://localhost:3000`, you can supervise the agent's actions in real-time.
 
-1. **Start the Sentinel Server and Frontend**: If you haven't already, start the server:
+1. **Start the Asteroid Server and Frontend**: If you haven't already, start the server:
 
     ```bash
     docker compose up
@@ -240,7 +254,7 @@ With the Sentinel web interface running at `http://localhost:3000`, you can supe
 
 ### Conclusion
 
-By using the `supervise()` decorator and Sentinel, we can ensure that our AI assistant operates within predefined policies and allows for human oversight when necessary. This example demonstrates how to integrate supervised tool executions into an AI assistant, enhancing safety and reliability.
+By using the `supervise()` decorator and Asteroid, we can ensure that our AI assistant operates within predefined policies and allows for human oversight when necessary. This example demonstrates how to integrate supervised tool executions into an AI assistant, enhancing safety and reliability.
 
 ---
 

@@ -5,23 +5,23 @@ description: "Supervise and evaluate agentic systems using UK's AI Safety Instit
 
 # Getting Started with Inspect AI
 
-Inspect AI is a powerful open-source framework for large language model evaluations. This guide will help you get started with running examples, editing configurations, and understanding the main functionalities of using entropy labs' approvers together with Inspect.
+Inspect AI is a powerful open-source framework for large language model evaluations. This guide will help you get started with running examples, editing configurations, and understanding the main functionalities of using Asteroid's approvers together with Inspect.
 
 > **Note** ⚠️: We are in the process of consolidating our functionality under the `asteroid-sdk` package, but the Inspect AI features are currently still available in the `entropy-labs` package. We are actively working on migrating all features to `asteroid-sdk` for a more unified experience.
 
 ## Running the Inspect AI Example
 
-You can run the Inspect AI example to see how it works and understand how to use it in your own projects. Before running the example, make sure that you cloned the Sentinel repository and that your frontend and backend server are running. You can start them using Docker Compose as described in the [Quickstart guide](/quickstart).
+You can run the Inspect AI example to see how it works and understand how to use it in your own projects. Before running the example, make sure that you cloned the Asteroid repository and that your frontend and backend server are running. You can start them using Docker Compose as described in the [Quickstart guide](/quickstart).
 
 ## Entropy Labs to Asteroid
 
 <Steps>
 
 <Step title="Install Dependencies">
-To get started, ensure that `inspect-ai` and `entropy-labs` are installed in your Python environment:
+To get started, ensure that `inspect-ai` and `asteroid-sdk` are installed in your Python environment:
 
 ````bash
-pip install inspect-ai entropy-labs --upgrade
+pip install inspect-ai asteroid-sdk --upgrade
 ````
 
 </Step>
@@ -60,14 +60,14 @@ if __name__ == "__main__":
 </Steps>
 
 
-## Registering Inspect AI Evaluations with Entropy Labs
+## Registering Inspect AI Evaluations with Asteroid
 
-To integrate Inspect AI evaluations with Entropy Labs, it's necessary to register projects, tasks, and runs. This registration ensures that your evaluation is correctly tracked and managed within the Entropy Labs platform. Additionally, you can optionally use the Entropy Labs scorer to score the finished evaluation using the Entropy Labs UI.
+To integrate Inspect AI evaluations with Asteroid, it's necessary to register projects, tasks, and runs. This registration ensures that your evaluation is correctly tracked and managed within the Asteroid platform. Additionally, you can optionally use the Asteroid scorer to score the finished evaluation using the Asteroid UI.
 
 Here are the relevant additions to the the Inspect Task definition:
 
 ```python
-from entropy_labs.api import register_inspect_samples_with_entropy_labs_solver, entropy_labs_web_ui_scorer
+from asteroid_sdk.api import register_inspect_samples_with_asteroid_sdk_solver, asteroid_sdk_web_ui_scorer
 
 ...
 
@@ -77,13 +77,13 @@ def approval_demo() -> Task:
     return Task(
         dataset=...,
         solver=[
-            register_inspect_samples_with_entropy_labs_solver(
+            register_inspect_samples_with_asteroid_sdk_solver(
                 project_name="inspect-example",
-                entropy_labs_backend_url="http://localhost:8080"
+                asteroid_sdk_backend_url="http://localhost:8080"
             ),
             ...
         ],
-        scorer=entropy_labs_web_ui_scorer(),
+        scorer=asteroid_sdk_web_ui_scorer(),
         sandbox="docker",
     )
 )
@@ -91,23 +91,23 @@ def approval_demo() -> Task:
 
 **Explanation of the Additions**:
 
-- **Registering Samples with Entropy Labs**: `register_inspect_samples_with_entropy_labs_solver` function is necessary for correctly registering your evaluation with Entropy Labs. It should be added to the `solver` list in your `Task` definition.
+- **Registering Samples with Asteroid**: `register_inspect_samples_with_asteroid_sdk_solver` function is necessary for correctly registering your evaluation with Asteroid. It should be added to the `solver` list in your `Task` definition.
     ```python
-    register_inspect_samples_with_entropy_labs_solver(
+    register_inspect_samples_with_asteroid_sdk_solver(
         project_name="inspect-example",
-        entropy_labs_backend_url="http://localhost:8080"
+        asteroid_sdk_backend_url="http://localhost:8080"
     )
     ```
 
-- **Using the Entropy Labs Scorer (Optional)**: The `entropy_labs_web_ui_scorer` function can be used to score the finished evaluation using the Entropy Labs UI. By setting the `scorer` parameter to `entropy_labs_web_ui_scorer()`, you enable scoring and feedback collection through the web interface.
+- **Using the Asteroid Scorer (Optional)**: The `asteroid_sdk_web_ui_scorer` function can be used to score the finished evaluation using the Asteroid UI. By setting the `scorer` parameter to `asteroid_sdk_web_ui_scorer()`, you enable scoring and feedback collection through the web interface.
 
     ```python
-    scorer=entropy_labs_web_ui_scorer()
+    scorer=asteroid_sdk_web_ui_scorer()
     ```
 
-**Note**: Ensure that you have the Entropy Labs backend server running and accessible at the URL specified in `entropy_labs_backend_url`. This is typically `http://localhost:8080` when running locally.
+**Note**: Ensure that you have the Asteroid backend server running and accessible at the URL specified in `asteroid_sdk_backend_url`. This is typically `http://localhost:8080` when running locally.
 
-**By incorporating these functions into your code, you enable seamless integration with Entropy Labs, enhancing your ability to monitor, manage, and assess your Inspect AI evaluations.**
+**By incorporating these functions into your code, you enable seamless integration with Asteroid, enhancing your ability to monitor, manage, and assess your Inspect AI evaluations.**
 
 
 ## Approval Configuration
@@ -116,13 +116,13 @@ Approvals in Inspect AI are configured using YAML files. Examples of approval co
 
 ### Using Approvers
 
-We follow the Inspect AI format for the approval configuration. Our approvers are in the `entropy-labs` package. You can install the `entropy-labs` package to get these approvers:
+We follow the Inspect AI format for the approval configuration. Our approvers are in the `asteroid-sdk` package. You can install the `asteroid-sdk` package to get these approvers:
 
 ````bash
-pip install entropy-labs
+pip install asteroid-sdk
 ````
 
-Then, you can reference the approvers in the approval configuration using names like `entropy_labs/human_approver`.
+Then, you can reference the approvers in the approval configuration using names like `asteroid_sdk/human_approver`.
 
 ### Approval Configuration Examples
 
@@ -132,7 +132,7 @@ The `approval_human.yaml` file configures human approval for all tools:
 
 ````yaml:examples/inspect_example/approval_human.yaml
 approvers:
-  - name: entropy_labs/human_approver
+  - name: asteroid_sdk/human_approver
     tools: "*"
     approval_api_endpoint: "http://localhost:8080"
     agent_id: "my_sample_1_agent"
@@ -145,7 +145,7 @@ The `approval_llm.yaml` file configures approval using a Language Model. The LLM
 
 ````yaml:examples/inspect_example/approval_llm.yaml
 approvers:
-  - name: entropy_labs/llm_approver
+  - name: asteroid_sdk/llm_approver
     tools: "*"
     instructions: |
       As an overseeing agent, please follow these guidelines for each LLM tool action:
@@ -167,14 +167,14 @@ In the `approval_escalation.yaml` example, approvals for bash and Python tools a
 
 ````yaml:examples/inspect_example/approval_escalation.yaml
 approvers:
-  - name: entropy_labs/bash_approver
+  - name: asteroid_sdk/bash_approver
     tools: "*bash*"
     allowed_commands: ["ls", "cd", "pwd", "echo", "cat", "grep", "mkdir", "cp", "wget", "curl", "pip"]
     allow_sudo: false
     command_specific_rules:
       pip: ["install", "list", "show"]
 
-  - name: entropy_labs/python_approver
+  - name: asteroid_sdk/python_approver
     tools: "*python*"
     allowed_modules: ["requests", "json", "csv", "datetime", "re", "math", "random", "time"]
     allowed_functions: ["print", "len", "range", "str", "int", "float", "list", "dict", "set", "tuple", "sum", "max", "min"]
@@ -182,7 +182,7 @@ approvers:
     sensitive_modules: ["os", "sys", "subprocess", "socket"]
     allow_system_state_modification: false
 
-  - name: entropy_labs/human_approver
+  - name: asteroid_sdk/human_approver
     tools: "*"
     approval_api_endpoint: "http://localhost:8080"
     agent_id: "testing_agent"
@@ -249,6 +249,6 @@ You can edit `run.py` to change the tasks, the tools used, and other aspects of 
 
 ## Additional Resources
 
-For more information on Inspect AI and approval configurations, refer to the [Inspect AI documentation](https://inspect.ai-safety-institute.org.uk/approval.html) and the [Entropy Labs package](https://pypi.org/project/entropy-labs/).
+For more information on Inspect AI and approval configurations, refer to the [Inspect AI documentation](https://inspect.ai-safety-institute.org.uk/approval.html) and the [Asteroid package](https://pypi.org/project/asteroid-sdk/).
 
 

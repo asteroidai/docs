@@ -1,6 +1,6 @@
-# Entropy Labs Documentation
+# Asteroid Documentation
 
-This repository contains the documentation for Entropy Labs [Sentinel](https://github.com/EntropyLabsAI/sentinel). It's based on the Mintlify starter kit.
+This repository contains the documentation for Asteroid [Asteroid](https://github.com/asteroidai/asteroid). It's based on the Mintlify starter kit.
 
 ### Development
 

@@ -18,12 +18,12 @@
   "topbarLinks": [
     {
       "name": "Support",
-      "url": "mailto:devs@entropy-labs.ai"
+      "url": "mailto:founders@asteroid.ai"
     }
   ],
   "topbarCtaButton": {
     "name": "GitHub",
-    "url": "https://github.com/EntropyLabsAI/sentinel"
+    "url": "https://github.com/asteroidai/asteroid"
   },
   "anchors": [
     {
@@ -58,6 +58,6 @@
     }
   ],
   "footerSocials": {
-    "github": "https://github.com/EntropyLabsAI/sentinel"
+    "github": "https://github.com/asteroidai/asteroid"
   }
 }
