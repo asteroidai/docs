@@ -29,7 +29,7 @@
     {
       "name": "API Reference",
       "openapi": "/openapi.yaml",
-      "url": "api-reference",
+      "url": "asteroid-api",
       "icon": "square-terminal"
     }
   ],
