@@ -45,13 +45,12 @@
     {
       "group": "Integrations",
       "pages": [
-        "openai",
-        "langchain",
+        "integrations/openai",
         {
           "group": "Inspect AI",
           "pages": [
-            "inspect-ai",
-            "inspect_benchmarks"
+            "integrations/inspect/inspect-ai",
+            "integrations/inspect/inspect_benchmarks"
           ]
         }
       ]
