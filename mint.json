@@ -38,7 +38,7 @@
       "group": "Get Started",
       "pages": [
         "introduction",
-        "registration",
+        "api_keys",
         "quickstart",
         "main_components"
       ]
