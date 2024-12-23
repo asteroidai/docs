@@ -5,7 +5,7 @@
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/favicon-32x32.png",
   "colors": {
     "primary": "#a3aab8",
     "light": "#bacef5",
@@ -25,22 +25,31 @@
     "name": "GitHub",
     "url": "https://github.com/asteroidai/asteroid"
   },
-  "anchors": [
-    {
-      "name": "API Reference",
-      "openapi": "https://api.asteroid.ai/api/v1/openapi.yaml",
-      "url": "asteroid-api",
-      "icon": "square-terminal"
-    }
-  ],
   "navigation": [
     {
       "group": "Get Started",
       "pages": [
         "introduction",
-        "api_keys",
         "quickstart",
-        "main_components"
+        "full_example",
+        "api_keys"
+      ]
+    },
+    {
+      "group": "Asteroid",
+      "pages": [
+        "components/overview",
+        "components/projects_tasks_runs",
+        "components/supervise_decorator",
+        {
+          "group": "Supervisors",
+          "pages": [
+            "supervisors/overview",
+            "supervisors/human",
+            "supervisors/llm",
+            "supervisors/code"
+          ]
+        }
       ]
     },
     {

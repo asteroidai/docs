@@ -1,0 +1,87 @@
+---
+title: 'Custom Supervisors'
+description: 'Custom supervisors let you run arbitrary code to check on agent actions before they execute'
+---
+
+You can create custom supervisors by implementing the `Supervisor` protocol. This allows you to define custom logic for approving, rejecting, modifying, or escalating function execution.
+
+### The `ToolCallSupervisor` Protocol
+
+Asteroid has a very simple protocol that defines the expected signature for supervisor functions:
+
+```python
+from typing import Optional, Protocol
+from uuid import UUID
+from openai import OpenAI
+from asteroid_sdk.supervision.config import SupervisionContext, SupervisionDecision
+from asteroid_sdk.types import Tool, ChatCompletionMessageToolCall
+
+class ToolCallSupervisor(Protocol):
+    """Protocol for tool call supervisors."""
+    
+    def __call__(
+        self,
+        tool: Tool,
+        tool_call: ChatCompletionMessageToolCall,
+        supervision_context: SupervisionContext,
+        ignored_attributes: list[str] = [],
+        supervision_request_id: Optional[UUID] = None,
+        previous_decision: Optional[SupervisionDecision] = None,
+        **kwargs
+    ) -> SupervisionDecision:
+        """Makes a decision based on the tool call and supervision context."""
+        ...
+```
+
+### Creating a Custom Supervisor
+
+Here's an example of creating a custom supervisor that checks if an email address is in a whitelist:
+
+```python
+from typing import List
+from asteroid_sdk.types import Tool, ChatCompletionMessageToolCall
+from asteroid_sdk.supervision.config import SupervisionDecision, SupervisionDecisionType, SupervisionContext
+import json
+
+def check_email_address_supervisor(whitelisted_emails: List[str]) -> ToolCallSupervisor:
+    def supervisor(
+        tool: Tool,
+        tool_call: ChatCompletionMessageToolCall,
+        supervision_context: SupervisionContext,
+        ignored_attributes: list[str] = [],
+        supervision_request_id: Optional[UUID] = None,
+        previous_decision: Optional[SupervisionDecision] = None,
+        **kwargs
+    ) -> SupervisionDecision:
+        # Parse the tool call arguments
+        args = json.loads(tool_call.function.arguments)
+        to_email = args.get('to')
+        
+        if to_email in whitelisted_emails:
+            return SupervisionDecision(
+                decision=SupervisionDecisionType.APPROVE,
+                explanation=f"The email address '{to_email}' is allowed."
+            )
+        else:
+            return SupervisionDecision(
+                decision=SupervisionDecisionType.ESCALATE,
+                explanation=f"The email address '{to_email}' is not in the whitelist."
+            )
+            
+    supervisor.__name__ = check_email_address_supervisor.__name__
+    supervisor.supervisor_attributes = {"whitelisted_emails": whitelisted_emails}
+    return supervisor
+```
+
+You can then use this custom supervisor in the `@supervise` decorator:
+
+```python
+@supervise(
+    supervision_functions=[
+        [check_email_address_supervisor(whitelisted_emails=['allowed@example.com'])]
+    ]
+)
+def send_email(to: str, subject: str, body: str):
+    # Function implementation
+    pass
+```

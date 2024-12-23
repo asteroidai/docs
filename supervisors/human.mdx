@@ -1,0 +1,25 @@
+---
+title: 'Human Supervisors'
+description: 'A human supervisor lets you easily add Human-in-the-Loop to your AI agent'
+---
+
+To involve human oversight in your application's decision-making process, you can use the `human_supervisor`. This supervisor escalates decisions to a human reviewer.
+
+### Using `human_supervisor`
+
+Here's how you can use the `human_supervisor` in your `@supervise` decorator:
+
+```python
+from asteroid_sdk.supervision.supervisors import human_supervisor
+
+@supervise(
+    supervision_functions=[
+        [human_supervisor(timeout=300)]  # Waits up to 300 seconds for human decision
+    ]
+)
+def sensitive_action(data):
+    # Function implementation
+    pass
+```
+
+When the `sensitive_action` function is called, it will pause execution until a human reviewer approves or rejects the action via the Asteroid supervision interface.

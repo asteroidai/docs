@@ -1,0 +1,59 @@
+---
+title: 'Supervise Decorator'
+description: 'Wrap your agent tools in our decorator to enable supervision'
+---
+
+The `@supervise` decorator is a powerful feature that adds supervision functionality to your functions or tools. It allows you to:
+
+- **Enforce constraints and validations** during function execution.
+- **Mock function responses** for testing and development.
+- **Reuse previous execution logs** to simulate tool responses.
+
+### Usage
+
+You can use the `@supervise` decorator to wrap your functions and specify supervision functions, mock policies, and responses.
+
+```python
+from asteroid_sdk.supervision import supervise, MockPolicy
+
+@supervise(
+    supervision_functions=[supervisor_function],  # Replace with your supervisor functions
+    mock_policy=MockPolicy.NO_MOCK,  # Choose an appropriate mock policy
+    mock_responses=None  # Provide mock responses if needed
+)
+def my_function(args):
+    # Function implementation
+    pass
+```
+
+### Example
+
+Here's an example using the `@supervise` decorator to supervise a function:
+
+```python
+from asteroid_sdk.supervision import supervise, human_supervisor, llm_supervisor
+
+# Define a policy or instructions for the LLM supervisor
+EMAIL_POLICY = "Ensure that the email content is appropriate and follows company guidelines."
+
+@supervise(
+    supervision_functions=[
+        [llm_supervisor(instructions=EMAIL_POLICY)],  # First supervision chain
+        [human_supervisor()]  # Second supervision chain
+    ]
+)
+def send_email(to: str, subject: str, body: str):
+    """
+    Send an email to the specified recipient.
+
+    Parameters:
+        to (str): Recipient's email address.
+        subject (str): Subject of the email.
+        body (str): Body content of the email.
+    """
+    # Implement the email sending logic
+    pass
+```
+
+In this example, the `send_email` function is supervised by an LLM supervisor, which checks the email content according to the provided policy, and a human supervisor for final approval.
+

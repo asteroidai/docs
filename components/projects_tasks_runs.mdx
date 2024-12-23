@@ -1,0 +1,35 @@
+---
+title: 'Projects, Tasks & Runs'
+description: 'Wrap your agent tools in our decorator to enable supervision'
+---
+
+In the Asteroid framework, a **Project** is a container for tasks, which in turn contain runs. This hierarchy helps organize and track experiments and deployments.
+
+- **Project**: A container for tasks; it could represent an AI application or service.
+- **Task**: Represents a specific task or experiment within a project.
+- **Run**: A single execution instance of a task, which can be monitored and supervised.
+
+### Registering a Project, Task, and Run
+
+To register a project, task, and run, you can use the `asteroid_init` function provided by the `asteroid-sdk` package.
+
+Here's how you can register all three in one Python snippet:
+
+```python
+from asteroid_sdk.wrappers.openai import asteroid_openai_client, asteroid_init
+# Initialize the OpenAI client
+client = OpenAI()
+
+# Important! For this to work, Asteroid server needs to be running, contact Asteroid to get access
+run_id = asteroid_init(
+    project_name="Project 1",
+    task_name="Task 1",
+    run_name="Run 1"
+)
+
+# When you wrap the client, all supervised functions will be registered
+wrapped_client = asteroid_openai_client(client, run_id)
+
+```
+
+This code snippet demonstrates how to set up the project structure in Asteroid, allowing you to track and manage your AI application's executions.

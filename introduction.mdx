@@ -1,9 +1,13 @@
 ---
 title: Introduction
-description: 'Documentation for Asteroid, the supervision and evaluation platform for agentic systems.'
+description: 'Asteroid helps you supervise and monitor your AI agents, enabling safe and reliable deployment in any domain'
 ---
 
-The Asteroid Platform is a supervision and evaluation platform for LLM-based systems built by [Asteroid](http://asteroid.ai/). Asteroid allows you to supervise and evaluate agentic systems during experimentation to quickly iterate on your agent architecture. In production, Asteroid's supervisors can continue to monitor your agent and intervene to correct the agent's actions, terminate the agent or escalate an action to a human reviewer. 
+Asteroid makes your AI agent more reliable and effective by supervising it while it's running. Using humans, AI, or code we help you monitor every action during experimentation or deployment:
+- During development, Asteroid makes it easy to rapidly catch failures and improve your agent. 
+- In production, Asteroid is your safety layer that will continue to monitor your agent and intervene to prevent bad actions, correct mistakes, terminate the agent or escalate to a human reviewer.
+
+Asteroid is **not** an agent framework; it hooks into your existing agent.
 
 ## Asteroid Demo
 
@@ -149,7 +153,3 @@ C-->|reviewer response|B;
 ```
 
 In this case, the agent submits a review to the server, which is then displayed in the UI for a human reviewer to approver or reject. The reviewer's response is then submitted back to the server, which updates the status of the review accordingly. 
-
-### Polling for Status Updates
-
-Agents currently poll the server for status updates on their submitted action request, and must hang until the review is complete. If required, we will add support for different types of responses in the future like webhooks or event-based notifications.
