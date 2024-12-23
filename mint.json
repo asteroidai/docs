@@ -28,7 +28,7 @@
   "anchors": [
     {
       "name": "API Reference",
-      "openapi": "/openapi.yaml",
+      "openapi": "https://api.asteroid.ai/api/v1/openapi.yaml",
       "url": "asteroid-api",
       "icon": "square-terminal"
     }
@@ -38,6 +38,7 @@
       "group": "Get Started",
       "pages": [
         "introduction",
+        "registration",
         "quickstart",
         "main_components"
       ]
