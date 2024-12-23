@@ -38,8 +38,8 @@
       "group": "Get Started",
       "pages": [
         "introduction",
-        "quickstart",
         "registration",
+        "quickstart",
         "main_components"
       ]
     },
