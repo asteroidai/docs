@@ -64,6 +64,12 @@
           ]
         }
       ]
+    },
+    {
+      "group": "Cookbook",
+      "pages": [
+        "cookbook"
+      ]
     }
   ],
   "footerSocials": {

@@ -1,0 +1,53 @@
+---
+title: 'Recipes'
+description: 'Examples of agents that use Asteroid, to help get you started'
+---
+
+We maintain a repository of example agents that use Asteroid for supervision. You can find them on our GitHub: https://github.com/asteroidai/cookbook.
+
+To run an example, follow these simple steps: 
+
+<Steps>
+  <Step title="Clone the Cookbook repo">
+    ```bash
+      git clone https://github.com/asteroidai/cookbook
+    ```
+  </Step>
+  <Step title="Pick an example">
+    For example, you could pick the `openai_quickstart` example:
+    ```bash
+      cd openai_quickstart
+    ```
+  </Step>
+  <Step title="(Recommended) Create a new environment">
+    For example, if you're using Conda:
+    ```bash
+      conda create -n asteroid
+      conda activate asteroid
+    ```
+  </Step>
+  <Step title="Install requirements">
+    ```bash
+      pip install -r requirements.txt
+    ```
+  </Step>
+  <Step title="Get an API Key">
+    Sign in https://platform.asteroid.ai and generate an API key, then set it with:
+    ```bash
+      export ASTEROID_API_KEY="your-key-here"
+    ```
+    See [API Keys](/api_keys) for more information.
+  </Step>
+  <Step title="Run the example">
+    ```bash
+      python run.py
+    ```
+  </Step>
+  <Step title="(Optional) Check on your agent in the platform">
+    Navigate to https://platform.asteroid.ai and find your agent in the interface
+  </Step>
+</Steps>
+
+That's it! You've now run an agent that uses Asteroid for supervision.
+
+If you have any problems, please reach out to us at founders@asteroid.ai or join our Slack community.
