@@ -25,14 +25,18 @@ If you'd prefer to run one of our example agents, please see [Cookbook](/cookboo
   <Step title="Initialise Asteroid">
     Before your agent starts running, you need to initialise Asteroid:
     ```python
-    init_code
+    run_id = asteroid_init(
+      project_name="My Project",
+      task_name="Booking Assistant",
+    )
     ```
     See more about initialisation [here](/components/projects_tasks_runs).
   </Step>
   <Step title="Wrap your LLM client">
-    After initialising Asteroid, you need to wrap your LLM client; simply initialise your normal LLM client, then use Asteroids provided wrappers:
+    After initialising Asteroid, you need to wrap your LLM client; simply initialise your normal LLM client, then use Asteroid's provided wrappers:
     ```python
-    wrap code
+      client = OpenAI()
+      wrapped_client = asteroid_openai_client(client, run_id)
     ```
     Find out more about the @supervise decorator [here](/components/supervise_decorate), and which supervisors are possible [here](/supervisors/overview).
   </Step>
@@ -40,5 +44,11 @@ If you'd prefer to run one of our example agents, please see [Cookbook](/cookboo
     Inspect the agents execution and respond to any human review requests in the interface.
 
     Navigate to https://platform.asteroid.ai and click `Projects` --> `Tasks` --> `Runs` and click on the latest run.
+  </Step>
+  <Step title="See more examples">
+    Check out a full worked example in [Full Example](/full_example).
+
+    Or if you'd prefer to see different examples, please see [Cookbook](/cookbook).
+
   </Step>
 </Steps>
