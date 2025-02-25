@@ -31,44 +31,15 @@
       "pages": [
         "introduction",
         "quickstart",
-        "full_example",
         "api_keys"
       ]
     },
     {
-      "group": "Asteroid",
+      "group": "SDKs",
       "pages": [
-        "components/overview",
-        "components/projects_tasks_runs",
-        "components/supervise_decorator",
-        {
-          "group": "Supervisors",
-          "pages": [
-            "supervisors/overview",
-            "supervisors/human",
-            "supervisors/llm",
-            "supervisors/code"
-          ]
-        }
-      ]
-    },
-    {
-      "group": "Integrations",
-      "pages": [
-        "integrations/openai",
-        {
-          "group": "Inspect AI",
-          "pages": [
-            "integrations/inspect/inspect-ai",
-            "integrations/inspect/inspect_benchmarks"
-          ]
-        }
-      ]
-    },
-    {
-      "group": "Cookbook",
-      "pages": [
-        "cookbook"
+        "sdk/overview",
+        "sdk/python",
+        "sdk/typescript"
       ]
     }
   ],

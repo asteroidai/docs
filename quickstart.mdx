@@ -3,14 +3,17 @@ title: 'Quickstart'
 description: 'Hook your agent up to Asteroid in minutes'
 ---
 
-If you'd prefer to run one of our example agents, please see [Cookbook](/cookbook)
+The easiest way to get started is to head to our platform and run a workflow from there: https://platform.asteroid.ai
+
+If you want to run a workflow from your own code, you can follow the steps below
+
 
 <Steps>
   <Step title="Install dependencies">
     Install the `asteroid-sdk` Python SDK:
 
     ```bash
-    pip install asteroid-sdk
+    npm install asteroid-odyssey
     ```
   </Step>
   <Step title="Generate an API key">
@@ -24,31 +27,74 @@ If you'd prefer to run one of our example agents, please see [Cookbook](/cookboo
   </Step>
   <Step title="Initialise Asteroid">
     Before your agent starts running, you need to initialise Asteroid:
-    ```python
-    run_id = asteroid_init(
-      project_name="My Project",
-      task_name="Booking Assistant",
-    )
+    ```ts
+import { AsteroidAgents } from 'asteroid-odyssey';
+import { CreateWorkflowRequest } from 'asteroid-odyssey/dist/generated/agents/models/CreateWorkflowRequest';
+
+// Define a simple prompt with a single variable: {{.date}}
+const prompt = `You are an AI assistant tasked with performing a simple task.
+Use your available tools to navigate to {{.website}} and book a meeting with {{.name}}.
+`;
+
+// Initialize the Asteroid agent with your API key.
+// Replace 'YOUR_ASTEROID_API_KEY' with your actual key.
+const asteroid = new AsteroidAgents('astdaEUCZJHFeS1DDQMKWQYEb0ei2cgGWSt2fWrGqIEYBZQNSAAdV911ZcrJahVD');
+
+/**
+ * This function creates a workflow, runs it with the current date,
+ * and polls until the workflow is completed.
+ */
+async function runSimpleWorkflowExample() {
+  try {
+    // Configure the workflow request
+    const workflowRequest: CreateWorkflowRequest = {
+      name: "Simple Task Workflow",
+      fields: {
+        workflow_name: "Booking Assistant",
+        start_url: "https://google.com"
+      },
+      prompts: [prompt],
+      provider: CreateWorkflowRequest.provider.OPENAI
+    };
+
+    // Create the workflow
+    const workflowID = await asteroid.createWorkflow("ceres", workflowRequest);
+    console.log('Workflow created with ID:', workflowID);
+
+    // Run the workflow with the required variable
+    const runID = await asteroid.runWorkflow(workflowID, {
+      website: "https://asteroid.ai",
+      name: "Asteroid Team"
+    });
+    console.log('Workflow run initiated with ID:', runID);
+
+    // Poll for the workflow status until it is completed
+    let attempts = 0;
+    while (attempts < 200) {
+      try {
+        const status = await asteroid.getRunStatus(runID);
+        console.log('Current workflow status:', status);
+        if (status === 'completed') {
+          break;
+        }
+      } catch (error) {
+        console.log('Run is not ready')
+      }
+      attempts++;
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    // Retrieve and display the result after completion
+    const result = await asteroid.getRunResult(runID);
+    console.log('Workflow completed. Result:', result);
+  } catch (error) {
+    console.error('Error executing the workflow:', error);
+  }
+}
+
+// Execute the workflow example
+runSimpleWorkflowExample();
     ```
-    See more about initialisation [here](/components/projects_tasks_runs).
   </Step>
-  <Step title="Wrap your LLM client">
-    After initialising Asteroid, you need to wrap your LLM client; simply initialise your normal LLM client, then use Asteroid's provided wrappers:
-    ```python
-      client = OpenAI()
-      wrapped_client = asteroid_openai_client(client, run_id)
-    ```
-    Find out more about the @supervise decorator [here](/components/supervise_decorate), and which supervisors are possible [here](/supervisors/overview).
-  </Step>
-  <Step title="Monitor and control agent via the platform">
-    Inspect the agents execution and respond to any human review requests in the interface.
 
-    Navigate to https://platform.asteroid.ai and click `Projects` --> `Tasks` --> `Runs` and click on the latest run.
-  </Step>
-  <Step title="See more examples">
-    Check out a full worked example in [Full Example](/full_example).
-
-    Or if you'd prefer to see different examples, please see [Cookbook](/cookbook).
-
-  </Step>
 </Steps>
