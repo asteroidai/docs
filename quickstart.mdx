@@ -3,98 +3,70 @@ title: 'Quickstart'
 description: 'Hook your agent up to Asteroid in minutes'
 ---
 
-The easiest way to get started is to head to our platform and run a workflow from there: https://platform.asteroid.ai
+The easiest way to get started is to head to our platform and run a workflow from there: [https://platform.asteroid.ai](https://platform.asteroid.ai)
 
-If you want to run a workflow from your own code, you can follow the steps below
-
+If you want to run a workflow from your own code, you can follow the steps below:
 
 <Steps>
   <Step title="Install dependencies">
-    Install the `asteroid-sdk` TypeScript SDK (we have a Python SDK too)
+    Install the `asteroid-odyssey` TypeScript SDK (we have a Python SDK too):
 
     ```bash
     npm install asteroid-odyssey
     ```
   </Step>
   <Step title="Generate an API key">
-    Sign in to https://platform.asteroid.ai, head to `API Keys` and generate a new key.
+    Sign in to [https://platform.asteroid.ai](https://platform.asteroid.ai), head to **API Keys** and generate a new key.
 
     ```bash
-      export ASTEROID_API_KEY="ast..."
+    export ASTEROID_API_KEY="ast..."
     ``` 
     
-    See [API Keys](/api_keys) for more.
+    See [API Keys](/api_keys) for more details.
   </Step>
   <Step title="Initialise Asteroid">
-    Before your agent starts running, you need to initialise Asteroid:
+    Initialize and execute your workflow in your code:
     ```ts
-import { AsteroidAgents } from 'asteroid-odyssey';
-import { CreateWorkflowRequest } from 'asteroid-odyssey/dist/generated/agents/models/CreateWorkflowRequest';
+    import { 
+      AsteroidClient, 
+      // Optionally, you can create a new workflow using createNewWorkflow:
+      // createNewWorkflow or create one on the platform
+      executeWorkflowById, 
+      waitForExecutionResult 
+    } from 'asteroid-sdk-ts';
 
-// Define a simple prompt with a single variable: {{.date}}
-const prompt = `You are an AI assistant tasked with performing a simple task.
-Use your available tools to navigate to {{.website}} and book a meeting with {{.name}}.
-`;
+    (async () => {
+      // Replace 'YOUR_ASTEROID_API_KEY' with your actual API key.
+      const client = AsteroidClient('YOUR_ASTEROID_API_KEY');
 
-// Initialize the Asteroid agent with your API key.
-// Replace 'YOUR_ASTEROID_API_KEY' with your actual key.
-const asteroid = new AsteroidAgents('astdaEUCZJHFeS1DDQMKWQYEb0ei2cgGWSt2fWrGqIEYBZQNSAAdV911ZcrJahVD');
+      // If needed, you can create a new workflow for an agent.
+      // This only needs to be done once. For example:
+      /*
+      const workflowId = await createNewWorkflow(client, 'example-agent', {
+        name: "Example Workflow",
+        result_schema: {},
+        fields: {
+          start_url: "https://google.com",
+        },
+        prompts: ["Go to the {{.repository}} GitHub repo and find the commit message of the {{.commit_number}} most recent commit."],
+        provider: "openai"
+      });
+      console.log("View your new workflow at: https://platform.asteroid.ai/workflows/" + workflowId);
+      */
 
-/**
- * This function creates a workflow, runs it with the current date,
- * and polls until the workflow is completed.
- */
-async function runSimpleWorkflowExample() {
-  try {
-    // Configure the workflow request
-    const workflowRequest: CreateWorkflowRequest = {
-      name: "Simple Task Workflow",
-      fields: {
-        workflow_name: "Booking Assistant",
-        start_url: "https://google.com"
-      },
-      prompts: [prompt],
-      provider: CreateWorkflowRequest.provider.OPENAI
-    };
+      // Execute an existing workflow.
+      // Replace 'YOUR_WORKFLOW_ID' with your workflow ID and adjust the execution data as needed.
+      const executionId = await executeWorkflowById(client, 'YOUR_WORKFLOW_ID', { repository: "kubernetes/kubernetes", commit_number: 3 });
+      console.log("Workflow execution started:", "https://platform.asteroid.ai/executions/" + executionId);
 
-    // Create the workflow
-    const workflowID = await asteroid.createWorkflow("ceres", workflowRequest);
-    console.log('Workflow created with ID:', workflowID);
-
-    // Run the workflow with the required variable
-    const runID = await asteroid.runWorkflow(workflowID, {
-      website: "https://asteroid.ai",
-      name: "Asteroid Team"
-    });
-    console.log('Workflow run initiated with ID:', runID);
-
-    // Poll for the workflow status until it is completed
-    let attempts = 0;
-    while (attempts < 200) {
+      // Wait for execution to complete and retrieve the result.
       try {
-        const status = await asteroid.getRunStatus(runID);
-        console.log('Current workflow status:', status);
-        if (status === 'completed') {
-          break;
-        }
-      } catch (error) {
-        console.log('Run is not ready')
+        const result = await waitForExecutionResult(client, executionId, 2000);
+        console.log("Workflow result:", result);
+      } catch (err) {
+        console.error("Workflow ended with an error:", err);
       }
-      attempts++;
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-
-    // Retrieve and display the result after completion
-    const result = await asteroid.getRunResult(runID);
-    console.log('Workflow completed. Result:', result);
-  } catch (error) {
-    console.error('Error executing the workflow:', error);
-  }
-}
-
-// Execute the workflow example
-runSimpleWorkflowExample();
+    })();
     ```
   </Step>
-
 </Steps>
