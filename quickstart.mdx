@@ -33,7 +33,7 @@ If you want to run a workflow from your own code, you can follow the steps below
       // createNewWorkflow or create one on the platform
       executeWorkflowById, 
       waitForExecutionResult 
-    } from 'asteroid-sdk-ts';
+    } from 'asteroid-odyssey';
 
     (async () => {
       // Replace 'YOUR_ASTEROID_API_KEY' with your actual API key.
@@ -41,8 +41,7 @@ If you want to run a workflow from your own code, you can follow the steps below
 
       // If needed, you can create a new workflow for an agent.
       // This only needs to be done once. For example:
-      /*
-      const workflowId = await createNewWorkflow(client, 'example-agent', {
+      const workflowId = await createNewWorkflow(client, 'iris', {
         name: "Example Workflow",
         result_schema: {},
         fields: {
@@ -52,7 +51,6 @@ If you want to run a workflow from your own code, you can follow the steps below
         provider: "openai"
       });
       console.log("View your new workflow at: https://platform.asteroid.ai/workflows/" + workflowId);
-      */
 
       // Execute an existing workflow.
       // Replace 'YOUR_WORKFLOW_ID' with your workflow ID and adjust the execution data as needed.
