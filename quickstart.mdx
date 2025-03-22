@@ -3,52 +3,68 @@ title: 'Quickstart'
 description: 'Hook your agent up to Asteroid in minutes'
 ---
 
-If you'd prefer to run one of our example agents, please see [Cookbook](/cookbook)
+The easiest way to get started is to head to our platform and run a workflow from there: [https://platform.asteroid.ai](https://platform.asteroid.ai)
+
+If you want to run a workflow from your own code, you can follow the steps below:
 
 <Steps>
   <Step title="Install dependencies">
-    Install the `asteroid-sdk` Python SDK:
+    Install the `asteroid-odyssey` TypeScript SDK (we have a Python SDK too):
 
     ```bash
-    pip install asteroid-sdk
+    npm install asteroid-odyssey
     ```
   </Step>
   <Step title="Generate an API key">
-    Sign in to https://platform.asteroid.ai, head to `API Keys` and generate a new key.
+    Sign in to [https://platform.asteroid.ai](https://platform.asteroid.ai), head to **API Keys** and generate a new key.
 
     ```bash
-      export ASTEROID_API_KEY="ast..."
+    export ASTEROID_API_KEY="ast..."
     ``` 
     
-    See [API Keys](/api_keys) for more.
+    See [API Keys](/api_keys) for more details.
   </Step>
   <Step title="Initialise Asteroid">
-    Before your agent starts running, you need to initialise Asteroid:
-    ```python
-    run_id = asteroid_init(
-      project_name="My Project",
-      task_name="Booking Assistant",
-    )
+    Initialize and execute your workflow in your code:
+    ```ts
+    import { 
+      AsteroidClient, 
+      // Optionally, you can create a new workflow using createNewWorkflow:
+      // createNewWorkflow or create one on the platform
+      executeWorkflowById, 
+      waitForExecutionResult 
+    } from 'asteroid-odyssey';
+
+    (async () => {
+      // Replace 'YOUR_ASTEROID_API_KEY' with your actual API key.
+      const client = AsteroidClient('YOUR_ASTEROID_API_KEY');
+
+      // If needed, you can create a new workflow for an agent.
+      // This only needs to be done once. For example:
+      const workflowId = await createNewWorkflow(client, 'iris', {
+        name: "Example Workflow",
+        result_schema: {},
+        fields: {
+          start_url: "https://google.com",
+        },
+        prompts: ["Go to the {{.repository}} GitHub repo and find the commit message of the {{.commit_number}} most recent commit."],
+        provider: "openai"
+      });
+      console.log("View your new workflow at: https://platform.asteroid.ai/workflows/" + workflowId);
+
+      // Execute an existing workflow.
+      // Replace 'YOUR_WORKFLOW_ID' with your workflow ID and adjust the execution data as needed.
+      const executionId = await executeWorkflowById(client, 'YOUR_WORKFLOW_ID', { repository: "kubernetes/kubernetes", commit_number: 3 });
+      console.log("Workflow execution started:", "https://platform.asteroid.ai/executions/" + executionId);
+
+      // Wait for execution to complete and retrieve the result.
+      try {
+        const result = await waitForExecutionResult(client, executionId, 2000);
+        console.log("Workflow result:", result);
+      } catch (err) {
+        console.error("Workflow ended with an error:", err);
+      }
+    })();
     ```
-    See more about initialisation [here](/components/projects_tasks_runs).
-  </Step>
-  <Step title="Wrap your LLM client">
-    After initialising Asteroid, you need to wrap your LLM client; simply initialise your normal LLM client, then use Asteroid's provided wrappers:
-    ```python
-      client = OpenAI()
-      wrapped_client = asteroid_openai_client(client, run_id)
-    ```
-    Find out more about the @supervise decorator [here](/components/supervise_decorate), and which supervisors are possible [here](/supervisors/overview).
-  </Step>
-  <Step title="Monitor and control agent via the platform">
-    Inspect the agents execution and respond to any human review requests in the interface.
-
-    Navigate to https://platform.asteroid.ai and click `Projects` --> `Tasks` --> `Runs` and click on the latest run.
-  </Step>
-  <Step title="See more examples">
-    Check out a full worked example in [Full Example](/full_example).
-
-    Or if you'd prefer to see different examples, please see [Cookbook](/cookbook).
-
   </Step>
 </Steps>

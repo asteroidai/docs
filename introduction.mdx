@@ -1,155 +1,52 @@
 ---
 title: Introduction
-description: 'Asteroid helps you supervise and monitor your AI agents, enabling safe and reliable deployment in any domain'
+description: 'Hosted Browser Agents for SMEs to automate complex workflows through our API'
 ---
 
-Asteroid makes your AI agent more reliable and effective by supervising it while it's running. Using humans, AI, or code we help you monitor every action during experimentation or deployment:
-- During development, Asteroid makes it easy to rapidly catch failures and improve your agent. 
-- In production, Asteroid is your safety layer that will continue to monitor your agent and intervene to prevent bad actions, correct mistakes, terminate the agent or escalate to a human reviewer.
-
-Asteroid is **not** an agent framework; it hooks into your existing agent.
-
-## Asteroid Demo
-
-<iframe
-  width="560"
-  height="315"
-  src="https://www.youtube.com/embed/X38hhugtRLg"
-  title="Asteroid Demo"
-  frameborder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowfullscreen
-></iframe>
-
+We offer scalable, secure, and easy-to-integrate API, empowering SMEs to leverage browser automation without the burden of managing infrastructure. Whether you need to extract data, simulate user interactions, or streamline repetitive online tasks, our solution delivers reliable, enterprise-grade automation at scale.
 
 
 ## Use Cases
 
-Asteroid is designed to be used in a wide range of use cases to enhance reliability, safety and performance of agentic systems, including but not limited to:
+Our hosted browser agents are perfect for a wide array of applications, including:
 
 <AccordionGroup>
-  <Accordion title="Agent Development">
-    Supervise agentic systems during experimentation and discover failure modes to quickly iterate on your agent architecture.
-    - **Tool Call Supervision**: Identify and fix failure modes by supervising tool calls.
-    - **Chat Supervision**: Supervise the chat responses and fix mistakes in the agent's responses.
-    - **LLM Response Mocking**: Reuse previous execution logs to mock function responses to test and reproduce results. Simulate LLM responses for unseen scenarios.
+  <Accordion title="Automated Data Extraction">
+    Seamlessly extract data from websites for integration into your analytics, CRM, or other business tools. Ideal for market research, competitive analysis, and data enrichment.
   </Accordion>
-  <Accordion title="Agents in Production">
-    In production, Asteroid can be used to monitor for undesired behaviour, and can intervene to correct the agent *before* it executes actions that could be problematic.
-    - **Tool Call Supervision**: Before the tool call is executed, the agent submits it to a supervisor for approval.
-    - **Chat Supervision**: Supervise the chat responses and fix mistakes in the agent's responses at runtime.
-    - **LLM Response Mocking**: Reuse execution logs to mock function responses to test and reproduce results. Simulate LLM responses for unseen scenarios.
- </Accordion>
+  <Accordion title="Web Application Testing">
+    Simulate real user interactions to validate your web applications. Execute end-to-end tests to ensure your site performs reliably under various scenarios.
+  </Accordion>
+  <Accordion title="Digital Workflow Automation">
+    Automate repetitive tasks like form submission, scheduling, and data entry. Free up your team to focus on strategic initiatives while our agents handle routine online operations.
+  </Accordion>
+  <Accordion title="E-commerce Automation">
+    Enhance your online operations by automating tasks such as price updates, inventory tracking, and order processing with dedicated browser agents.
+  </Accordion>
 </AccordionGroup>
 
+## API Integration
 
-## Tool Call Supervisors
+Our browser agents are fully accessible via a robust API. With a single API call, you can trigger a browser agent to perform specific web tasks. Our API is designed with:
 
-Asteroid has an API that agents can call to submit actions for approval. The request is routed via a predefined list of **supervisors**. When presented when with an action, a supervisor can:
+- **Ease of Use:** Simple, well-documented endpoints that integrate seamlessly with your systems.
+- **Scalability:** Horizontally scalable operations to support high-volume task automation.
+- **Security:** Enterprise-grade security protocols to ensure your data is protected at every stage.
 
-- `approve` The action is safe and the agent can proceed.
-- `reject` The action is unsafe and should not be executed, but the agent can continue.
-- `modify` The action has been approved with modifications.
-- `escalate` The action should be escalated to the next supervisor.
-- `terminate` The agents execution should be terminated.
+## Architecture
 
-Finally, after the supervisors have made their decisions, the agent receives a response indicating the outcome of the approval process, which is either `approve`, `reject`, `modify`, or `terminate`. It is up to the agent's source code to handle these responses appropriately.
+Our infrastructure is written in Go and runs on Kubernetes, making it perfectly suited to scale massively. We offer SDKs to interface with our server that orchestrates agents and handles all the heavy lifting. We provide a simple web platform for you to configure your agents and monitor their performance.
 
-### Parallel Supervision Chains
-Supervisors can be grouped into **supervision chains** which are executed in parallel. This allows for a fast and efficient approval process, where multiple supervisors can approve or reject an action at the same time. As a dummy example, you can create 2 supervisor chains that are attached to the `send_email()` tool:
+## Customization & Scalability
 
-**Supervision Chains Example - Send Email**
+We understand that every business has unique needs. Our platform enables you to tailor browser agents to suit your specific workflow requirements. Whether you need a custom automation script or a standardized solution, our hosted agents are flexible and scalable as your business grows.
 
-In this example, both supervisor chains need to approve the action before the agent can proceed. You can configure many more supervisors and chains as you see fit with different policies.
-<CardGroup cols={2}>
-  <Card title="Chain 1 - Check Email Domains and Content">
-    <Steps>
-      <Step title="Check Email Domains Supervisor">
-        Deterministic Supervisor that only allows emails to be sent to whitelisted domains: `['my-company.com', 'asteroid.ai']`
-      </Step>
-      <Step title="Check Email Content Supervisor">
-        LLM Supervisor that checks the email content for sensitive information and ensures it aligns with company policies.
-      </Step>
-    </Steps>
-  </Card>
-  <Card title="Chain 2 - Check Email Urgency and Risk">
-    <Steps>
-      <Step title="Check Email Urgency Supervisor">
-        LLM Supervisor that evaluates the urgency and importance of the email based on its content.
-      </Step>
-      <Step title="Check Email Risk Human Supervisor">
-        Human Supervisor to review and approve emails flagged as high-risk or requiring human judgment.
-      </Step>
-    </Steps>
-  </Card>
-</CardGroup>
+## Reliability and Security
 
-### Supervisor Types
-Asteroid currently provides three main types of supervisors for handling tool call supervision: Human, LLM (Large Language Model), and Deterministic. Each supervisor has a different use cases, can be highly customised or you can create completely custom supervisors.
+Built for enterprise-grade operations, our hosted browser agents feature:
 
-<CardGroup cols={3}>
-  <Card title="Human Supervisor" icon="user-check">
-    <p>
-      A human reviews the tool call suggestion made by the agent and returns an approval decision.
-    </p>
-    <p>
-      <ul>
-        <li>--> Allows manual review and decision-making by a human.</li>
-        <li>--> Useful for high risk scenarios requiring human judgment and oversight.</li>
-        <li>--> Supports 1 or more tool call suggestions per approval, allowing a human to choose the best option.</li>
-      </ul>
-    </p>
-  </Card>
+- **Robust Error Handling:** Automated retries and comprehensive logging to ensure smooth operations.
+- **Secure Cloud Hosting:** Strong security protocols keep your data safe.
+- **Transparent Monitoring:** Continuous monitoring gives you insights into agent performance and reliability.
 
-  <Card title="LLM Supervisor" icon="robot">
-    <p>
-      A Large Language Model with a customisable prompt analyses the tool call suggestion made by the agent and returns an approval decision.
-    </p>
-    <p>
-      <ul>
-        <li>--> Automates decision-making </li>
-        <li>--> Ideal for high-volume or lower risk routine tasks where human intervention is not necessary.</li>
-      </ul>
-    </p>
-  </Card>
-
-  <Card title="Code Supervisor" icon="code">
-    <p>
-      A code-based supervisor can run arbitrary code to determine the approval decision. This could be useful for simple approval processes that are known ahead of time, such as whitelisting emails, commands, or URLs, or for more complex approval processes like those requiring custom classifiers or business logic. 
-    </p>
-  </Card>
-</CardGroup>
-
-
-#### Custom Supervisors
-Asteroid allows for custom supervisors to be created and plugged in to the approval process. This allows for a wide range of use cases, including but not limited to:
-- Integrating with existing approval workflows
-- Implementing specialized logic for certain types of actions
-
-
-
-
-
-## LLM Response Mocking 
-You can reuse previous execution logs to mock function responses, which is useful for testing and reproducing results. When mocking is enabled, the function will not execute its actual logic. Instead, it will behave according to the specified mock policy. You can mock function responses using different `MockPolicy` options.
-
-- **SAMPLE_LIST**: Returns a random element from `mock_responses`.
-- **SAMPLE_RANDOM**: Creates a random value matching the return type.
-- **SAMPLE_LLM**: Uses an LLM to generate a response.
-- **SAMPLE_PREVIOUS_CALLS**: Samples responses from previous executions.
-
-# Architecture
-
-Asteroid uses a simple client-server architecture. The client is a React application that displays information related to agents and their supervision to human operators. The server is a Go application that handles the API requests from the agent and routes them to the appropriate supervisor. Supervisors can be configured via the UI.
-
-Consider the following diagram for a high level overview of how Asteroid works in the case of the Human Supervisor:
-
-```mermaid
-graph TD;
-A[Agent]-->|submit review|B[Asteroid Server];
-A-->|poll status|B;
-B-->|submit review|C[Asteroid UI];
-C-->|reviewer response|B;
-```
-
-In this case, the agent submits a review to the server, which is then displayed in the UI for a human reviewer to approver or reject. The reviewer's response is then submitted back to the server, which updates the status of the review accordingly. 
+Discover how our hosted browser agents can revolutionize your digital workflows by integrating advanced browser automation directly into your API-driven operations.
