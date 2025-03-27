@@ -16,9 +16,65 @@ It is recommended to install the SDK in a virtual environment like https://docs.
 Here's a quick example to get started:
 
 ```python
-from asteroid_odyssey import AsteroidAgents
+import os
+from uuid import UUID
+from asteroid_odyssey.client import AsteroidClient
 
-client = AsteroidAgents('YOUR_API_KEY')
+# Constants
+WORKFLOW_NAME = "Commercial auto insurance application"
+START_URL = "https://www.primeis.com/forms/commercial-auto-application/"
+
+WORKFLOW_PROMPT = """
+You are extremely advanced AI browser agent. 
+Your task is to fill in the data to a form {{.DATA}}. 
+Escalate to human before submitting the form!
+""".strip()
+
+FORM_DATA = """
+Business Name: Acme Corporation
+Applicant Name: John Doe
+Mailing Address: 123 Main Street, Springfield, IL 62701
+""".strip()
+
+def log_status(status):
+    """Callback function to log execution status updates."""
+    print(f"Execution status updated: {status}")
+
+def main():
+    # Initialize client
+    client = AsteroidClient(api_key=os.getenv("ASTEROID_API_KEY"))
+
+    try:
+        # Create workflow
+        workflow_id = client.create_workflow(
+            workflow_name=WORKFLOW_NAME,
+            start_url=START_URL,
+            prompt=WORKFLOW_PROMPT
+        )
+        print(f"Created workflow with ID: {workflow_id}")
+
+        # Execute workflow
+        execution_params = {"DATA": FORM_DATA}
+        result = client.execute_workflow_and_get_result(
+            workflow_id=UUID(workflow_id),
+            execution_params=execution_params,
+            polling_interval=2.0,  # Check every 2 seconds
+            timeout=600,  # Wait up to 10 minutes
+            status_callback=log_status
+        )
+        
+        # Print execution summary
+        print(f"\nExecution Summary:")
+        print(f"Final status: {result.status}")
+        print(f"Result: {result.result}")
+
+    except TimeoutError:
+        print("Execution timed out")
+    except Exception as e:
+        print(f"Error during execution: {str(e)}")
+
+if __name__ == "__main__":
+    main()
 ```
 
 ## Requirements
