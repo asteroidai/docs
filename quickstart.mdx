@@ -30,23 +30,18 @@ If you want to run a workflow from your own code, you can follow the steps below
     import { 
       AsteroidClient, 
       // Optionally, you can create a new workflow using createNewWorkflow:
-      // createNewWorkflow or create one on the platform
+      // This only needs to be done once. You can also create a workflow on the platform.
+      createNewWorkflow,
       executeWorkflowById, 
       waitForExecutionResult 
     } from 'asteroid-odyssey';
 
     (async () => {
-      // Replace 'YOUR_ASTEROID_API_KEY' with your actual API key.
       const client = AsteroidClient('YOUR_ASTEROID_API_KEY');
 
-      // If needed, you can create a new workflow for an agent.
-      // This only needs to be done once. For example:
       const workflowId = await createNewWorkflow(client, 'iris', {
         name: "Example Workflow",
-        result_schema: {},
-        fields: {
-          start_url: "https://google.com",
-        },
+        start_url: "https://google.com",
         prompts: ["Go to the {{.repository}} GitHub repo and find the commit message of the {{.commit_number}} most recent commit."],
         provider: "openai"
       });
