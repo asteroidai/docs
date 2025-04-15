@@ -1,0 +1,61 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Starter Kit",
+  "colors": {
+    "primary": "#a3aab8",
+    "light": "#bacef5",
+    "dark": "#323b4d"
+  },
+  "favicon": "/favicon-32x32.png",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "api_keys"
+            ]
+          },
+          {
+            "group": "SDKs",
+            "pages": [
+              "sdk/python",
+              "sdk/typescript"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "openapi": "https://odyssey.asteroid.ai/api/v1/openapi.yaml"
+      }
+    ]
+  },
+  "logo": {
+    "light": "/logo/logo-128-nobg.png",
+    "dark": "/logo/logo-128-nobg.png"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:founders@asteroid.ai"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "GitHub",
+      "href": "https://github.com/asteroidai"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/asteroidai"
+    }
+  }
+}
