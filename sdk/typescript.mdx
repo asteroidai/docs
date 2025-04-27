@@ -1,24 +1,268 @@
-# TypeScript SDK Installation
-
-The Asteroid Odyssey TypeScript SDK provides a simple way to interact with the Asteroid Agents API. The SDK is fully typed.
+The Asteroid Odyssey TypeScript SDK provides a simple way to interact with the Asteroid Agents API. The SDK is fully typed and supports all major features of the platform.
 
 ## Installation
 
-You can install the SDK using npm:
-```bash
-npm install asteroid-odyssey
-```
+<Steps>
+  <Step title="Install Dependencies">
+    Install the required packages:
 
-## Basic Usage
+    ```bash
+    npm install asteroid-odyssey typescript ts-node
+    ```
+  </Step>
+  <Step title="Create Your File">
+    Create a new file called `example.ts` and add this code:
 
-Here's a quick example to get started:
+    ```typescript
+    import { 
+      AsteroidClient, 
+      createNewWorkflow,
+      executeWorkflowById, 
+      waitForExecutionResult 
+    } from 'asteroid-odyssey';
+
+    (async () => {
+      // Initialize the client with your API key
+      const client = AsteroidClient('YOUR_API_KEY');
+
+      // Create a new workflow
+      const workflowId = await createNewWorkflow(client, 'iris', {
+        name: "Example Workflow",
+        start_url: "https://google.com",
+        prompts: ["Go to the {{.repository}} GitHub repo and find the commit message of the {{.commit_number}} most recent commit."],
+        result_schema: {
+          "type": "object",
+          "properties": {
+            "commit_message": {
+              "type": "string",
+              "description": "The commit message"
+            }
+          },
+          "required": ["commit_message"]
+        },
+        provider: "openai"
+      });
+      console.log("View your new workflow at: https://platform.asteroid.ai/workflows/" + workflowId);
+
+      // Execute the workflow
+      const executionId = await executeWorkflowById(client, workflowId, { 
+        repository: "kubernetes/kubernetes", 
+        commit_number: 3 
+      });
+      console.log("Workflow execution started:", "https://platform.asteroid.ai/executions/" + executionId);
+
+      // Wait for execution to complete and retrieve the result
+      try {
+        const result = await waitForExecutionResult(client, executionId, 2000);
+        console.log("Workflow result:", result);
+      } catch (err) {
+        console.error("Workflow ended with an error:", err);
+      }
+    })();
+    ```
+  </Step>
+  <Step title="Run Your Code">
+    Run the example using ts-node:
+
+    ```bash
+    npx ts-node example.ts
+    ```
+
+    Replace `YOUR_API_KEY` with your actual API key from the Asteroid platform.
+  </Step>
+</Steps>
+
+## API Reference
+
+### Workflow Management
+
+#### Creating a New Workflow
 
 ```typescript
-import { AsteroidAgents } from 'asteroid-odyssey';
+import { createNewWorkflow } from 'asteroid-odyssey';
 
-const client = new AsteroidAgents('YOUR_API_KEY');
+const workflowId = await createNewWorkflow(client, 'iris', {
+  name: "Website Navigation Example",
+  workflow_options: {
+    max_pause_duration: 10000,
+    allowed_tools: ["go_to_url"],
+    require_human_approval_to_finish: false
+  },
+  result_schema: {
+    "additionalProperties": false,
+    "properties": {
+      "page_title": {
+        "description": "The title of the webpage",
+        "type": "string"
+      },
+      "url": {
+        "description": "The URL that was visited",
+        "type": "string"
+      }
+    },
+    "required": ["page_title", "url"],
+    "type": "object"
+  },
+  start_url: "https://google.com",
+  prompts: [
+    "Go to the website at {{.url}}",
+    "Get the page title and return it along with the current URL"
+  ],
+  provider: "openai"
+});
 ```
 
-## License
+Key components of workflow creation:
+- `workflow_options`: Configure workflow behavior
+  - `max_pause_duration`: Maximum time (ms) the workflow can pause
+  - `allowed_tools`: List of tools the workflow can use (e.g., "go_to_url")
+  - `require_human_approval_to_finish`: Whether human approval is needed
+- `result_schema`: Define the expected structure of the result
+  - Uses JSON Schema format
+  - Defines required fields and their types
+  - Ensures type safety for results
+- `prompts`: Instructions for the agent
+  - Can include template variables using `{{.variableName}}`
+  - Can specify which tools to use
 
-The Asteroid Odyssey SDK is available under the MIT License.
+#### Executing a Workflow
+
+```typescript
+import { executeWorkflowById } from 'asteroid-odyssey';
+
+const executionId = await executeWorkflowById(client, 'YOUR_WORKFLOW_ID', {
+  url: "https://example.com"
+});
+```
+
+### Execution Management
+
+#### Execution Status
+
+The execution status indicates the current state of a workflow execution. Possible statuses include:
+
+- `starting`: The workflow is initializing
+- `running`: The workflow is currently executing
+- `paused`: The workflow is temporarily paused
+- `completed`: The workflow finished successfully
+- `cancelled`: The workflow was manually cancelled
+- `failed`: The workflow encountered an error
+
+```typescript
+import { getExecutionStatus } from 'asteroid-odyssey';
+
+const execution = await getExecutionStatus(client, executionId);
+console.log(execution.status?.status); // e.g., "completed"
+console.log(execution.status?.reason); // Error message if failed
+```
+
+#### Progress Updates
+
+Progress updates provide real-time information about the workflow's execution. Each update includes:
+- A timestamp
+- A progress message
+- The execution ID
+
+Example progress updates:
+
+```typescript
+// Navigation progress
+[
+  {
+    "execution_id": "ff9a37ec-fd6b-4187-b2e6-b2bca2703c1e",
+    "progress": "🌐 Starting navigation to webpage: https://example.com",
+    "created_at": "2024-04-27T12:42:23.000Z"
+  },
+  {
+    "execution_id": "ff9a37ec-fd6b-4187-b2e6-b2bca2703c1e",
+    "progress": "✅ Successfully loaded the webpage",
+    "created_at": "2024-04-27T12:42:24.000Z"
+  }
+]
+
+// Tool execution progress
+[
+  {
+    "execution_id": "ff9a37ec-fd6b-4187-b2e6-b2bca2703c1e",
+    "progress": "✅ Tool browser_click executed successfully",
+    "created_at": "2024-04-27T12:43:36.000Z"
+  }
+]
+```
+
+You can get progress updates using:
+
+```typescript
+import { getWorkflowExecutionProgress } from 'asteroid-odyssey';
+
+const progressUpdates = await getWorkflowExecutionProgress(client, executionId);
+progressUpdates.forEach(update => {
+  console.log(`[${new Date(update.created_at).toLocaleTimeString()}] ${update.progress}`);
+});
+```
+
+#### Execution Results
+
+The execution result contains the output of the workflow, structured according to the `result_schema` defined in the workflow. For example:
+
+```typescript
+// Example result from a website navigation workflow
+{
+  "execution_id": "ff9a37ec-fd6b-4187-b2e6-b2bca2703c1e",
+  "final_answer": "Successfully navigated to the website and retrieved the page title.",
+  "outcome": "success",
+  "reasoning": "The page was loaded successfully and the title was extracted.",
+  "result": {
+    "page_title": "Example Domain",
+    "url": "https://example.com"
+  }
+}
+```
+
+You can get the result using:
+
+```typescript
+import { getWorkflowResult } from 'asteroid-odyssey';
+
+const result = await getWorkflowResult(client, executionId);
+console.log(result.result.page_title); // Access the structured result
+```
+
+#### Getting Results vs Waiting for Results
+
+There are two ways to get workflow results:
+
+1. `getWorkflowResult`: Returns the current result immediately, even if the workflow is still running. This is useful when you want to check the progress of a long-running workflow without waiting for completion.
+
+2. `waitForExecutionResult`: Waits for the workflow to complete (or fail) before returning the result. This is useful when you need the final result and want to handle any errors that occur during execution.
+
+```typescript
+// Using getWorkflowResult - returns immediately
+const currentResult = await getWorkflowResult(client, executionId);
+console.log("Current result:", currentResult);
+
+// Using waitForExecutionResult - waits for completion
+try {
+  const finalResult = await waitForExecutionResult(client, executionId, 2000);
+  console.log("Final result:", finalResult);
+} catch (err) {
+  console.error("Workflow ended with an error:", err);
+}
+```
+
+### Error Handling
+
+All SDK methods throw errors when something goes wrong. Here's how to handle them:
+
+```typescript
+try {
+  const result = await waitForExecutionResult(client, executionId);
+  console.log(result);
+} catch (error) {
+  if (error instanceof Error) {
+    console.error('Execution failed:', error.message);
+  }
+}
+```
+
+For more detailed examples and use cases, see the [TypeScript SDK Examples](../sdk/typescript-examples).
