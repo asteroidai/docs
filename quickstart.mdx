@@ -8,13 +8,6 @@ The easiest way to get started is to head to our platform and run a workflow fro
 If you want to run a workflow from your own code, you can follow the steps below:
 
 <Steps>
-  <Step title="Install dependencies">
-    Install the `asteroid-odyssey` TypeScript SDK (we have a Python SDK too):
-
-    ```bash
-    npm install asteroid-odyssey
-    ```
-  </Step>
   <Step title="Generate an API key">
     Sign in to [https://platform.asteroid.ai](https://platform.asteroid.ai), head to **API Keys** and generate a new key.
 
@@ -24,42 +17,21 @@ If you want to run a workflow from your own code, you can follow the steps below
     
     See [API Keys](/api_keys) for more details.
   </Step>
-  <Step title="Initialise Asteroid">
-    Initialize and execute your workflow in your code:
-    ```ts
-    import { 
-      AsteroidClient, 
-      // Optionally, you can create a new workflow using createNewWorkflow:
-      // This only needs to be done once. You can also create a workflow on the platform.
-      createNewWorkflow,
-      executeWorkflowById, 
-      waitForExecutionResult 
-    } from 'asteroid-odyssey';
+  <Step title="Choose your SDK">
+    We provide SDKs for both TypeScript and Python. Choose the one that best fits your needs:
 
-    (async () => {
-      const client = AsteroidClient('YOUR_ASTEROID_API_KEY');
+    - [TypeScript SDK](/sdk/typescript)
+    - [Python SDK](/sdk/python)
 
-      const workflowId = await createNewWorkflow(client, 'iris', {
-        name: "Example Workflow",
-        start_url: "https://google.com",
-        prompts: ["Go to the {{.repository}} GitHub repo and find the commit message of the {{.commit_number}} most recent commit."],
-        provider: "openai"
-      });
-      console.log("View your new workflow at: https://platform.asteroid.ai/workflows/" + workflowId);
-
-      // Execute an existing workflow.
-      // Replace 'YOUR_WORKFLOW_ID' with your workflow ID and adjust the execution data as needed.
-      const executionId = await executeWorkflowById(client, 'YOUR_WORKFLOW_ID', { repository: "kubernetes/kubernetes", commit_number: 3 });
-      console.log("Workflow execution started:", "https://platform.asteroid.ai/executions/" + executionId);
-
-      // Wait for execution to complete and retrieve the result.
-      try {
-        const result = await waitForExecutionResult(client, executionId, 2000);
-        console.log("Workflow result:", result);
-      } catch (err) {
-        console.error("Workflow ended with an error:", err);
-      }
-    })();
-    ```
+    Each SDK page contains detailed documentation and examples to help you get started.
   </Step>
 </Steps>
+
+## Next Steps
+
+Once you've set up your environment, you can:
+
+1. Create your first workflow using the platform UI
+2. Follow the examples in the SDK documentation
+
+Need help? Contact us at [founders@asteroid.ai](mailto:founders@asteroid.ai)

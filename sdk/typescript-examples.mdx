@@ -1,0 +1,213 @@
+This page contains practical examples and use cases for the Asteroid Odyssey TypeScript SDK.
+
+## Comprehensive Form Filling Example
+
+Here's a complete example that demonstrates all major features of the SDK, including workflow creation, execution, progress monitoring, and result handling:
+
+```typescript
+import {
+  AsteroidClient,
+  createNewWorkflow,
+  executeWorkflowById,
+  waitForExecutionResult,
+  getExecutionStatus,
+  getWorkflowExecutionProgress
+} from 'asteroid-odyssey';
+
+// Configuration
+const API_KEY = 'YOUR_API_KEY';
+const client = AsteroidClient(API_KEY);
+
+// Constants
+const EXECUTION_TIMEOUT_MS = 300000; // 5 minutes
+const POLLING_INTERVAL_MS = 1000;    // 1 second
+
+/**
+ * Example function that demonstrates form filling using the Asteroid SDK.
+ * This example shows how to:
+ * 1. Create a workflow for form filling
+ * 2. Execute the workflow with test data
+ * 3. Monitor progress in real-time
+ * 4. Handle different execution states
+ * 5. Retrieve results
+ */
+async function fillInsuranceForm() {
+  console.log('Starting insurance form filling example...');
+  let intervalId: NodeJS.Timeout | null = null;
+
+  try {
+    // Step 1: Create a new workflow
+    const workflowId = await createNewWorkflow(client, 'iris', {
+      name: "Insurance Form Filler Test",
+      workflow_options: {
+        max_pause_duration: 10000,
+        allowed_tools: ["browser_subtask"], // Special tool for faster form filling
+        require_human_approval_to_finish: false
+      },
+      result_schema: {
+        "additionalProperties": false,
+        "properties": {
+          "filled_data": {
+            "description": "The data that was filled in the form",
+            "type": "string"
+          },
+        },
+        "required": ["filled_data"],
+        "type": "object"
+      },
+      start_url: "https://asteroid.ai/form2",
+      fields: {},
+      prompts: [
+        "Fill out the insurance form with the following information: " +
+        "First Name: {{.firstName}}, Last Name: {{.lastName}}, " +
+        "Date of Birth: {{.dateOfBirth}}, Email: {{.email}}, " +
+        "Phone Number: {{.phoneNumber}}. " +
+        "For 'Do you currently have insurance?': {{.hasInsurance}}. " +
+        "For 'Would you like to receive our newsletter?': {{.newsletter}}. " +
+        "Check the 'I agree to the terms and conditions' checkbox and submit the form. " +
+        "Use the browser_subtask tool to fill in the form."
+      ],
+      provider: "openai"
+    });
+
+    console.log('Created workflow with ID:', workflowId);
+    console.log('Workflow is visible at: https://platform.asteroid.ai/workflows/' + workflowId);
+
+    // Step 2: Execute the workflow with test data
+    const executionId = await executeWorkflowById(client, workflowId, {
+      firstName: "Petter",
+      lastName: "Pettersson",
+      dateOfBirth: "01-01-1990",
+      email: "petter@example.com",
+      phoneNumber: "1234567890",
+      hasInsurance: "Yes",
+      newsletter: "Yes"
+    });
+
+    console.log('Started execution with ID:', executionId);
+    console.log('Execution is visible at: https://platform.asteroid.ai/executions/' + executionId);
+
+    // Step 3: Set up progress monitoring
+    let lastProgressLength = 0;
+    let timeoutId: NodeJS.Timeout;
+
+    // Cleanup function to clear intervals and timeouts
+    const cleanup = () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+
+    // Start progress monitoring
+    intervalId = setInterval(async () => {
+      try {
+        const currentProgress = await getWorkflowExecutionProgress(client, executionId);
+        if (currentProgress.length > lastProgressLength) {
+          const newProgress = currentProgress.slice(lastProgressLength);
+          console.log('\nNew progress updates:');
+          newProgress.forEach(update => {
+            console.log(`[${new Date(update.created_at).toLocaleTimeString()}] ${update.progress}`);
+          });
+          lastProgressLength = currentProgress.length;
+        }
+      } catch (error) {
+        console.log('Error getting progress:', error);
+      }
+    }, POLLING_INTERVAL_MS);
+
+    // Set execution timeout
+    timeoutId = setTimeout(() => {
+      cleanup();
+      console.log('Execution timed out');
+    }, EXECUTION_TIMEOUT_MS);
+
+    // Step 4: Wait for execution result and check final status
+    console.log('\nWaiting for execution result...');
+    try {
+      const result = await waitForExecutionResult(client, executionId, POLLING_INTERVAL_MS, EXECUTION_TIMEOUT_MS);
+      cleanup();
+
+      // Get final status to understand the execution outcome
+      const finalStatus = await getExecutionStatus(client, executionId);
+      console.log('\nFinal execution status:', JSON.stringify(finalStatus, null, 2));
+      
+      console.log('Execution completed with result:', JSON.stringify(result, null, 2));
+      return {
+        status: finalStatus.status?.status || 'unknown',
+        result: result,
+        reason: finalStatus.status?.reason
+      };
+    } catch (error) {
+      cleanup();
+      console.log('Execution failed or was cancelled:', error);
+      return { 
+        status: 'error', 
+        reason: error instanceof Error ? error.message : 'Unknown error' 
+      };
+    }
+
+  } catch (error) {
+    console.error('Error in form filling:', error);
+    if (error instanceof Error) {
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+    } else {
+      console.error('Raw error object:', JSON.stringify(error, null, 2));
+    }
+    return { status: 'error', reason: 'Unexpected error occurred' };
+  } finally {
+    if (intervalId) {
+      clearInterval(intervalId);
+    }
+  }
+}
+
+/**
+ * Main function to run the form filling example
+ */
+async function runFormFillingExample() {
+  console.log('Starting Asteroid SDK form filling example...');
+
+  try {
+    const result = await fillInsuranceForm();
+    console.log('\nForm filling completed with result:', JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error('Form filling failed:', error);
+  }
+}
+
+// Run the form filling example
+runFormFillingExample();
+```
+
+When you run this example, you'll see real-time progress updates in your terminal.
+```
+Starting Asteroid SDK form filling example...
+Starting insurance form filling example...
+Created workflow with ID: efba027d-8a27-4f61-9307-f8945dff3ff3
+Workflow is visible at: https://platform.asteroid.ai/workflows/efba027d-8a27-4f61-9307-f8945dff3ff3
+Started execution with ID: bf55f72c-f779-4a05-adb0-8951ba7fcdf5
+Execution is visible at: https://platform.asteroid.ai/executions/bf55f72c-f779-4a05-adb0-8951ba7fcdf5
+
+Waiting for execution result...
+
+New progress updates:
+[2:25:48 PM] 🌐 Starting navigation to webpage: https://asteroid.ai/form2
+[2:25:49 PM] ✅ Successfully loaded the webpage
+[2:25:51 PM] ✨ Step 1
+[2:25:54 PM] ⏳ Waiting for 1 seconds to allow page content to load
+[2:25:55 PM] ✨ Step 2
+[2:26:04 PM] 🤖 Agent is pondering: Filling out personal information form
+[2:26:04 PM] 🔄 Starting browser subtask
+[2:26:05 PM] ✅ Successfully captured snapshot of the page
+[2:26:08 PM] ✅ Tool browser_type executed successfully
+...
+```
+

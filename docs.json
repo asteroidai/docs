@@ -24,8 +24,19 @@
           {
             "group": "SDKs",
             "pages": [
-              "sdk/python",
-              "sdk/typescript"
+              {
+                "group": "Python",
+                "pages": [
+                  "sdk/python"
+                ]
+              },
+              {
+                "group": "TypeScript",
+                "pages": [
+                  "sdk/typescript",
+                  "sdk/typescript-examples"
+                ]
+              }
             ]
           }
         ]
